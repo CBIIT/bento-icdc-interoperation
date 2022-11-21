@@ -15,7 +15,7 @@ const accessLogStream = fs.createWriteStream(
   { flags: "a" }
 );
 
-const interoperationsRouter = require("./routes/interoperation");
+const interoperationRouter = require("./routes/interoperation");
 
 const app = express();
 app.use(cors());
@@ -25,7 +25,7 @@ app.use(logger("combined", { stream: accessLogStream }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/api/interoperation", interoperationsRouter);
+app.use("/api/interoperation", interoperationRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
