@@ -3,6 +3,8 @@ const path = require("path");
 const logger = require("morgan");
 const fs = require("fs");
 const cors = require("cors");
+const graphql = require("./data-management/init-graphql");
+const interoperationRouter = require("./routes/interoperation");
 
 const LOG_FOLDER = "logs";
 if (!fs.existsSync(LOG_FOLDER)) {
@@ -15,8 +17,6 @@ const accessLogStream = fs.createWriteStream(
   { flags: "a" }
 );
 
-const interoperationRouter = require("./routes/interoperation");
-
 const app = express();
 app.use(cors());
 
@@ -26,6 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/interoperation", interoperationRouter);
+app.use("/api/interoperation/graphql", graphql);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
