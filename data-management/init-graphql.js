@@ -7,6 +7,7 @@ const schema = buildSchema(
 
 const root = {
   hello: "Hello World!",
+  studiesByProgram: [],
 };
 
 module.exports = graphqlHTTP((req, res) => {
@@ -14,19 +15,10 @@ module.exports = graphqlHTTP((req, res) => {
     graphiql: true,
     schema: schema,
     rootValue: root,
-    // context: {
-    //   userInfo: req.session.userInfo,
-    // },
+    context: {},
     customFormatErrorFn: (error) => {
-      let status = undefined;
-      let body = { error: undefined };
-      //   try {
-      //     status = errorType[error.message].statusCode;
-      //     body.error = errorType[error.message].message;
-      //   } catch (err) {
-      //     status = 500;
-      //     body.error = "Internal server error: " + error;
-      //   }
+      let status = error.message;
+      let body = { error: status };
       res.status(status);
       return body;
     },
