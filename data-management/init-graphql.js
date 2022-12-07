@@ -6,7 +6,6 @@ const schema = buildSchema(
 );
 
 const root = {
-  hello: "Hello World!",
   studiesByProgram: [],
 };
 
