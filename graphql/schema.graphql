@@ -1,0 +1,36 @@
+# directive @cypher(statement: String!) on FIELD_DEFINITION
+
+schema {
+  query: QueryType
+}
+
+type Link {
+  text: String
+  url: String
+}
+
+type StudyOfProgram {
+  CRDCLinks: [Link]
+  numberOfCRDCNodes: Int
+  numberOfImageCollections: Int
+}
+
+type QueryType {
+  studiesByProgram: [StudyOfProgram]
+  # @cypher(
+  #   statement: """
+  #   MATCH (s:study)
+  #   MATCH (s)<--(ic:image_collection)
+  #   WITH ic
+  #   COUNT(DISTINCT ic) AS numberOfImageCollections,
+  #   COUNT(DISTINCT ic.repository_name) AS numberOfCRDCNodes,
+  #   COLLECT(DISTINCT ic{text: ic.image_collection_name + ' - ' + ic.repository_name,
+  #   url: ic.image_collection_url}) AS CRDCLinks
+  #   RETURN{
+  #   numberOfImageCollections: numberOfImageCollections,
+  #   numberOfCRDCNodes: numberOfCRDCNodes,
+  #   CRDCLinks: CRDCLinks
+  #   }
+  #   """
+  # )
+}
