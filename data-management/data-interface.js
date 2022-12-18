@@ -1,24 +1,15 @@
 const fetch = require("node-fetch");
 const { search } = require("fast-fuzzy");
+const { filterObjectArray } = require("../util/array-util");
 const config = require("../config");
-
-const IDC_API_BASE_URL = "https://api.imaging.datacommons.cancer.gov/v1";
-const IDC_COLLECTION_BASE_URL =
-  "https://portal.imaging.datacommons.cancer.gov/explore/filters/?collection_id=";
-const IDC_API_COLLECTIONS_ENDPOINT = "/collections";
-
-const TCIA_API_BASE_URL =
-  "https://services.cancerimagingarchive.net/services/v4";
-const TCIA_COLLECTION_BASE_URL =
-  "https://nbia.cancerimagingarchive.net/nbia-search/?MinNumberOfStudiesCriteria=1&CollectionCriteria=";
-const TCIA_API_COLLECTIONS_ENDPOINT = "/TCIA/query/getCollectionValues";
-
-// filter an array of objects on a specified key
-function filterObjectArray(array, property, key) {
-  return array.filter((obj) => {
-    return obj[property].includes(key);
-  });
-}
+const {
+  IDC_API_BASE_URL,
+  IDC_COLLECTION_BASE_URL,
+  IDC_API_COLLECTIONS_ENDPOINT,
+  TCIA_API_BASE_URL,
+  TCIA_COLLECTION_BASE_URL,
+  TCIA_API_COLLECTIONS_ENDPOINT,
+} = require("../constants/interop-constant");
 
 // fetch and filter IDC image collections
 async function getIdcCollections() {
