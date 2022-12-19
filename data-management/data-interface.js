@@ -91,17 +91,25 @@ async function mapCollectionsToStudies() {
       let numImageCollections = 0;
 
       if (idcMatches.length !== 0) {
-        const topIdcMatch = idcMatches[0];
-        const idcCollectionUrl = `${IDC_COLLECTION_BASE_URL}${topIdcMatch}`;
-        collectionUrls.push({ text: topIdcMatch, url: idcCollectionUrl });
-        numImageCollections++;
+        for (match in idcMatches) {
+          const idcCollectionUrl = `${IDC_COLLECTION_BASE_URL}${idcMatches[match]}`;
+          collectionUrls.push({
+            text: `${idcMatches[match]} (IDC)`,
+            url: idcCollectionUrl,
+          });
+          numImageCollections++;
+        }
         numCrdcNodes++;
       }
       if (tciaMatches.length !== 0) {
-        const topTciaMatch = tciaMatches[0];
-        const tciaCollectionUrl = `${TCIA_COLLECTION_BASE_URL}${topTciaMatch}`;
-        collectionUrls.push({ text: topTciaMatch, url: tciaCollectionUrl });
-        numImageCollections++;
+        for (match in tciaMatches) {
+          const tciaCollectionUrl = `${TCIA_COLLECTION_BASE_URL}${tciaMatches[match]}`;
+          collectionUrls.push({
+            text: `${tciaMatches[match]} (TCIA)`,
+            url: tciaCollectionUrl,
+          });
+          numImageCollections++;
+        }
         numCrdcNodes++;
       }
       if (collectionUrls.length !== 0) {
@@ -109,6 +117,7 @@ async function mapCollectionsToStudies() {
           CRDCLinks: collectionUrls,
           numberOfCRDCNodes: numCrdcNodes,
           numberOfImageCollections: numImageCollections,
+          clinical_study_designation: icdcStudies[study],
         });
       }
     }

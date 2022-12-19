@@ -8,6 +8,7 @@ type Link {
 }
 
 type StudyOfProgram {
+  clinical_study_designation: String
   CRDCLinks: [Link]
   numberOfCRDCNodes: Int
   numberOfImageCollections: Int
