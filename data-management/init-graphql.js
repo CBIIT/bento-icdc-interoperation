@@ -1,12 +1,13 @@
 const { buildSchema } = require("graphql");
 const { graphqlHTTP } = require("express-graphql");
+const { mapCollectionsToStudies } = require("./data-interface");
 
 const schema = buildSchema(
   require("fs").readFileSync("graphql/schema.graphql", "utf8")
 );
 
 const root = {
-  studiesByProgram: [],
+  studiesByProgram: mapCollectionsToStudies,
 };
 
 module.exports = graphqlHTTP((req, res) => {

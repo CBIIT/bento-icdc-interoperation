@@ -1,2 +1,5 @@
 # bento-icdc-interoperation
-- Skeleton/shell for ICDC image collection fetching microservice
+
+## Environment variables
+
+    - BENTO_BACKEND_GRAPHQL_URI: Bento backend URI for GraphQL POST requests
