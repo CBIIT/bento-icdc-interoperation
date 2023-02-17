@@ -2,9 +2,26 @@ schema {
   query: QueryType
 }
 
+type StudyMiscMetadata {
+  cancer_type: String
+  doi: String
+  species: String
+  subject_count: Int
+}
+
+type StudyPrimaryMetadata {
+  collection_id: String
+  date: String
+  description: String
+  modality: String
+  location: String
+  misc: StudyMiscMetadata
+}
+
 type Link {
-  text: String
+  repository: String
   url: String
+  metadata: StudyPrimaryMetadata
 }
 
 type StudyOfProgram {

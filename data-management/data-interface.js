@@ -18,13 +18,12 @@ async function getIdcCollections() {
       `${IDC_API_BASE_URL}${IDC_API_COLLECTIONS_ENDPOINT}`
     );
     const data = await response.json();
-    const filtered = filterObjectArray(
+    const filteredCollections = filterObjectArray(
       data["collections"],
       "collection_id",
       "icdc_"
     );
-    const collectionIds = filtered.map((obj) => obj.collection_id);
-    return collectionIds;
+    return filteredCollections;
   } catch (error) {
     console.error(error);
     return error;
@@ -83,7 +82,10 @@ async function mapCollectionsToStudies() {
 
     for (study in icdcStudies) {
       // fuzzy match strings using damerau-levenshtein distance
-      let idcMatches = search(icdcStudies[study], idcCollections);
+      let idcMatches = search(
+        icdcStudies[study],
+        idcCollections.map((obj) => obj.collection_id)
+      );
       let tciaMatches = search(icdcStudies[study], tciaCollections);
 
       let collectionUrls = [];
@@ -93,9 +95,25 @@ async function mapCollectionsToStudies() {
       if (idcMatches.length !== 0) {
         for (match in idcMatches) {
           const idcCollectionUrl = `${IDC_COLLECTION_BASE_URL}${idcMatches[match]}`;
+          const idcCollectionMetadata = idcCollections.find(
+            (obj) => obj.collection_id === idcMatches[match]
+          );
           collectionUrls.push({
-            text: `${idcMatches[match]} (IDC)`,
+            repository: "IDC",
             url: idcCollectionUrl,
+            metadata: {
+              collection_id: idcCollectionMetadata.collection_id,
+              date: idcCollectionMetadata.date_updated,
+              description: idcCollectionMetadata.description,
+              modality: idcCollectionMetadata.image_types,
+              location: idcCollectionMetadata.location,
+              misc: {
+                cancer_type: idcCollectionMetadata.cancer_type,
+                doi: idcCollectionMetadata.doi,
+                species: idcCollectionMetadata.species,
+                subject_count: idcCollectionMetadata.subject_count,
+              },
+            },
           });
           numImageCollections++;
         }
@@ -105,7 +123,7 @@ async function mapCollectionsToStudies() {
         for (match in tciaMatches) {
           const tciaCollectionUrl = `${TCIA_COLLECTION_BASE_URL}${tciaMatches[match]}`;
           collectionUrls.push({
-            text: `${tciaMatches[match]} (TCIA)`,
+            repository: "TCIA",
             url: tciaCollectionUrl,
           });
           numImageCollections++;
