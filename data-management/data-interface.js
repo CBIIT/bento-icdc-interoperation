@@ -101,19 +101,7 @@ async function mapCollectionsToStudies() {
           collectionUrls.push({
             repository: "IDC",
             url: idcCollectionUrl,
-            metadata: {
-              collection_id: idcCollectionMetadata.collection_id,
-              date: idcCollectionMetadata.date_updated,
-              description: idcCollectionMetadata.description,
-              modality: idcCollectionMetadata.image_types,
-              location: idcCollectionMetadata.location,
-              misc: {
-                cancer_type: idcCollectionMetadata.cancer_type,
-                doi: idcCollectionMetadata.doi,
-                species: idcCollectionMetadata.species,
-                subject_count: idcCollectionMetadata.subject_count,
-              },
-            },
+            metadata: idcCollectionMetadata,
           });
           numImageCollections++;
         }
