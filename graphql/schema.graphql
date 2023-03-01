@@ -2,26 +2,35 @@ schema {
   query: QueryType
 }
 
-type StudyMiscMetadata {
+type IdcMetadata implements CollectionMetadata {
+  Collection: String
   cancer_type: String
+  date_updated: String
+  description: String
   doi: String
+  image_types: String
+  location: String
   species: String
   subject_count: Int
+  supporting_data: String
 }
 
-type StudyPrimaryMetadata {
-  collection_id: String
-  date: String
-  description: String
-  modality: String
-  location: String
-  misc: StudyMiscMetadata
+type TciaMetadata implements CollectionMetadata {
+  Collection: String
+  total_patientIDs: Int
+  unique_modalities: [String]
+  unique_bodypartsExamined: [String]
+  total_imageCounts: Int
+}
+
+interface CollectionMetadata {
+  Collection: String
 }
 
 type Link {
   repository: String
   url: String
-  metadata: StudyPrimaryMetadata
+  metadata: CollectionMetadata
 }
 
 type StudyOfProgram {
