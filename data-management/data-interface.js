@@ -145,9 +145,9 @@ async function mapCollectionsToStudies() {
             (tot, obj) => tot + parseInt(obj.ImageCount),
             0
           );
-          const totalPatients = tciaCollectionMetadata.map(
-            (obj) => obj.PatientID
-          ).length;
+          const totalPatients = [
+            ...new Set(tciaCollectionMetadata.map((obj) => obj.PatientID)),
+          ].length;
           const uniqueModalities = [
             ...new Set(tciaCollectionMetadata.map((obj) => obj.Modality)),
           ];
