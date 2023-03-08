@@ -7,4 +7,5 @@ module.exports = Object.freeze({
   TCIA_COLLECTION_BASE_URL:
     "https://nbia.cancerimagingarchive.net/nbia-search/?MinNumberOfStudiesCriteria=1&CollectionCriteria=",
   TCIA_API_COLLECTIONS_ENDPOINT: "/TCIA/query/getCollectionValues",
+  TCIA_API_SERIES_ENDPOINT: "/TCIA/query/getSeries?Collection=",
 });

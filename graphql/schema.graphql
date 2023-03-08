@@ -2,9 +2,9 @@ schema {
   query: QueryType
 }
 
-type CollectionMetadata {
+type IdcMetadata implements CollectionMetadata {
+  Collection: String
   cancer_type: String
-  collection_id: String
   date_updated: String
   description: String
   doi: String
@@ -13,6 +13,18 @@ type CollectionMetadata {
   species: String
   subject_count: Int
   supporting_data: String
+}
+
+type TciaMetadata implements CollectionMetadata {
+  Collection: String
+  total_patientIDs: Int
+  unique_modalities: [String]
+  unique_bodypartsExamined: [String]
+  total_imageCounts: Int
+}
+
+interface CollectionMetadata {
+  Collection: String
 }
 
 type Link {

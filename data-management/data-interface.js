@@ -9,6 +9,7 @@ const {
   TCIA_API_BASE_URL,
   TCIA_COLLECTION_BASE_URL,
   TCIA_API_COLLECTIONS_ENDPOINT,
+  TCIA_API_SERIES_ENDPOINT,
 } = require("../constants/interop-constant");
 
 // fetch and filter IDC image collections
@@ -23,14 +24,19 @@ async function getIdcCollections() {
       "collection_id",
       "icdc_"
     );
-    return filteredCollections;
+    // create shared/common property for IDC/TCIA responses
+    const updatedFilteredCollections = filteredCollections.map((obj) => {
+      const { collection_id: Collection, ...others } = obj;
+      return { Collection, ...others };
+    });
+    return updatedFilteredCollections;
   } catch (error) {
     console.error(error);
     return error;
   }
 }
 
-// fetch and filter TCIA image collections
+// fetch and filter TCIA image collection IDs
 async function getTciaCollections() {
   try {
     const response = await fetch(
@@ -40,6 +46,20 @@ async function getTciaCollections() {
     const filtered = filterObjectArray(data, "Collection", "ICDC-");
     const collectionIds = filtered.map((obj) => obj.Collection);
     return collectionIds;
+  } catch (error) {
+    console.error(error);
+    return error;
+  }
+}
+
+// fetch specific TCIA image collection metadata
+async function getTciaCollectionData(collection_id) {
+  try {
+    const response = await fetch(
+      `${TCIA_API_BASE_URL}${TCIA_API_SERIES_ENDPOINT}${collection_id}`
+    );
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error(error);
     return error;
@@ -78,13 +98,21 @@ async function mapCollectionsToStudies() {
     const tciaCollections = await getTciaCollections();
     const icdcStudies = await getIcdcStudyIds();
 
+    let tciaCollectionsData = {};
     let collectionMappings = [];
+
+    for (collection in tciaCollections) {
+      const tciaCollectionData = await getTciaCollectionData(
+        tciaCollections[collection]
+      );
+      tciaCollectionsData[tciaCollections[collection]] = tciaCollectionData;
+    }
 
     for (study in icdcStudies) {
       // fuzzy match strings using damerau-levenshtein distance
       let idcMatches = search(
         icdcStudies[study],
-        idcCollections.map((obj) => obj.collection_id)
+        idcCollections.map((obj) => obj.Collection)
       );
       let tciaMatches = search(icdcStudies[study], tciaCollections);
 
@@ -95,9 +123,11 @@ async function mapCollectionsToStudies() {
       if (idcMatches.length !== 0) {
         for (match in idcMatches) {
           const idcCollectionUrl = `${IDC_COLLECTION_BASE_URL}${idcMatches[match]}`;
-          const idcCollectionMetadata = idcCollections.find(
-            (obj) => obj.collection_id === idcMatches[match]
+          let idcCollectionMetadata = idcCollections.find(
+            (obj) => obj.Collection === idcMatches[match]
           );
+          // specify explicit type of metadata returned for GraphQL interface
+          idcCollectionMetadata["__typename"] = "IdcMetadata";
           collectionUrls.push({
             repository: "IDC",
             url: idcCollectionUrl,
@@ -110,9 +140,34 @@ async function mapCollectionsToStudies() {
       if (tciaMatches.length !== 0) {
         for (match in tciaMatches) {
           const tciaCollectionUrl = `${TCIA_COLLECTION_BASE_URL}${tciaMatches[match]}`;
+          let tciaCollectionMetadata = tciaCollectionsData[tciaMatches[match]];
+          const totalImages = tciaCollectionMetadata.reduce(
+            (tot, obj) => tot + parseInt(obj.ImageCount),
+            0
+          );
+          const totalPatients = [
+            ...new Set(tciaCollectionMetadata.map((obj) => obj.PatientID)),
+          ].length;
+          const uniqueModalities = [
+            ...new Set(tciaCollectionMetadata.map((obj) => obj.Modality)),
+          ];
+          const uniqueBodypartsExamined = [
+            ...new Set(
+              tciaCollectionMetadata.map((obj) => obj.BodyPartExamined)
+            ),
+          ];
           collectionUrls.push({
             repository: "TCIA",
             url: tciaCollectionUrl,
+            metadata: {
+              // specify explicit type of metadata returned for GraphQL interface
+              __typename: "TciaMetadata",
+              Collection: tciaMatches[match],
+              total_patientIDs: totalPatients,
+              unique_modalities: uniqueModalities,
+              unique_bodypartsExamined: uniqueBodypartsExamined,
+              total_imageCounts: totalImages,
+            },
           });
           numImageCollections++;
         }
