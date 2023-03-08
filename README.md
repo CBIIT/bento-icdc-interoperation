@@ -6,7 +6,7 @@ This microservice supports interoperability between the ICDC and other nodes in 
 
 ## Interoperation process overview
 
-![Interoperation Sequence Diagram](./public/images/sequence_diagram.png)
+![Interoperation Sequence Diagram](./doc/sequence_diagram.png)
 
 &nbsp;
 
