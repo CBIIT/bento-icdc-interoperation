@@ -2,8 +2,8 @@ schema {
   query: QueryType
 }
 
-type IdcMetadata implements CollectionMetadata {
-  Collection: String
+type IdcMetadata {
+  collection_id: String
   cancer_type: String
   date_updated: String
   description: String
@@ -15,7 +15,7 @@ type IdcMetadata implements CollectionMetadata {
   supporting_data: String
 }
 
-type TciaMetadata implements CollectionMetadata {
+type TciaMetadata {
   Collection: String
   total_patientIDs: Int
   unique_modalities: [String]
@@ -23,14 +23,12 @@ type TciaMetadata implements CollectionMetadata {
   total_imageCounts: Int
 }
 
-interface CollectionMetadata {
-  Collection: String
-}
+union Metadata = IdcMetadata | TciaMetadata
 
 type Link {
   repository: String
   url: String
-  metadata: CollectionMetadata
+  metadata: Metadata
 }
 
 type StudyOfProgram {
