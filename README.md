@@ -12,10 +12,10 @@ This microservice supports interoperability between the ICDC and other nodes in 
 
 ## Data available from CRDC nodes
 
-| CRDC Node |                                                  Response data fields                                                   |
-| :-------: | :---------------------------------------------------------------------------------------------------------------------: |
-|    IDC    | Collection, cancer_type, date_updated, description, doi, image_types, location, species, subject_count, supporting_data |
-|   TCIA    |              Collection, total_patientIDs, unique_modalities, unique_bodypartsExamined, total_imageCounts               |
+| CRDC Node |                                                    Response data fields                                                    |
+| :-------: | :------------------------------------------------------------------------------------------------------------------------: |
+|    IDC    | collection_id, cancer_type, date_updated, description, doi, image_types, location, species, subject_count, supporting_data |
+|   TCIA    |                Collection, total_patientIDs, unique_modalities, unique_bodypartsExamined, total_imageCounts                |
 
 &nbsp;
 
@@ -31,8 +31,8 @@ This microservice supports interoperability between the ICDC and other nodes in 
             url,
             repository,
             metadata {
-                Collection,
                 ... on IdcMetadata {
+                    collection_id,
                     cancer_type,
                     date_updated,
                     description,
@@ -44,6 +44,7 @@ This microservice supports interoperability between the ICDC and other nodes in 
                     supporting_data
                 }
                 ... on TciaMetadata {
+                    Collection,
                     total_patientIDs,
                     unique_modalities,
                     unique_bodypartsExamined,
@@ -72,7 +73,7 @@ This microservice supports interoperability between the ICDC and other nodes in 
                         "url": "https://portal.imaging.datacommons.cancer.gov/explore/filters/?collection_id=icdc_glioma",
                         "repository": "IDC",
                         "metadata": {
-                            "Collection": "icdc_glioma",
+                            "collection_id": "icdc_glioma",
                             "cancer_type": "Glioma",
                             "date_updated": "2022-10-10",
                             "description": "<p><b><a href=\"https://doi.org/10.7937/TCIA.SVQT-Q016\" target=\"_blank\">ICDC-Glioma</a>&#160;</b>contains treatment-na&#239;ve naturally-occurring <b>canine glioma</b> participants from the&#160;<a href=\"https://caninecommons.cancer.gov/#/study/GLIOMA01\">Integrated Canine Data Commons</a>. Brain radiology (57/81 participant animals) and H&amp;E-stained biopsy or necropsy pathology (76/81 participants) are classified by veterinary and physician neuropathologists.<br>&#10;&#9;<br>&#10;&#9;Please see the wiki <a href=\"https://doi.org/10.7937/TCIA.SVQT-Q016\" target=\"_blank\"><b>ICDC-Glioma</b></a>&#160;to learn more about the images and to obtain any supporting metadata for this collection.</p>&#10;",
