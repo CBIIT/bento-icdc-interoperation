@@ -24,12 +24,7 @@ async function getIdcCollections() {
       "collection_id",
       "icdc_"
     );
-    // create shared/common property for IDC/TCIA responses
-    const updatedFilteredCollections = filteredCollections.map((obj) => {
-      const { collection_id: Collection, ...others } = obj;
-      return { Collection, ...others };
-    });
-    return updatedFilteredCollections;
+    return filteredCollections;
   } catch (error) {
     console.error(error);
     return error;
@@ -112,7 +107,7 @@ async function mapCollectionsToStudies() {
       // fuzzy match strings using damerau-levenshtein distance
       let idcMatches = search(
         icdcStudies[study],
-        idcCollections.map((obj) => obj.Collection)
+        idcCollections.map((obj) => obj.collection_id)
       );
       let tciaMatches = search(icdcStudies[study], tciaCollections);
 
@@ -124,9 +119,9 @@ async function mapCollectionsToStudies() {
         for (match in idcMatches) {
           const idcCollectionUrl = `${IDC_COLLECTION_BASE_URL}${idcMatches[match]}`;
           let idcCollectionMetadata = idcCollections.find(
-            (obj) => obj.Collection === idcMatches[match]
+            (obj) => obj.collection_id === idcMatches[match]
           );
-          // specify explicit type of metadata returned for GraphQL interface
+          // specify explicit type of metadata returned for GraphQL union
           idcCollectionMetadata["__typename"] = "IdcMetadata";
           collectionUrls.push({
             repository: "IDC",
@@ -160,7 +155,7 @@ async function mapCollectionsToStudies() {
             repository: "TCIA",
             url: tciaCollectionUrl,
             metadata: {
-              // specify explicit type of metadata returned for GraphQL interface
+              // specify explicit type of metadata returned for GraphQL union
               __typename: "TciaMetadata",
               Collection: tciaMatches[match],
               total_patientIDs: totalPatients,

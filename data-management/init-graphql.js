@@ -17,8 +17,17 @@ module.exports = graphqlHTTP((req, res) => {
     rootValue: root,
     context: {},
     customFormatErrorFn: (error) => {
-      let status = error.message;
-      let body = { error: status };
+      let status;
+      let body = { error: undefined };
+      try {
+        status = 400;
+        body.error =
+          error.message.replace(/\"/g, "") +
+          ` ${JSON.stringify(error.locations).replace(/\"/g, "")}`;
+      } catch (err) {
+        status = 500;
+        body.error = "Internal server error: " + error;
+      }
       res.status(status);
       return body;
     },
