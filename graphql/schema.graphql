@@ -2,7 +2,7 @@ schema {
   query: QueryType
 }
 
-type IdcMetadata {
+type IDCMetadata {
   collection_id: String
   cancer_type: String
   date_updated: String
@@ -15,7 +15,7 @@ type IdcMetadata {
   supporting_data: String
 }
 
-type TciaMetadata {
+type TCIAMetadata {
   Collection: String
   total_patientIDs: Int
   unique_modalities: [String]
@@ -23,7 +23,7 @@ type TciaMetadata {
   total_imageCounts: Int
 }
 
-union Metadata = IdcMetadata | TciaMetadata
+union Metadata = IDCMetadata | TCIAMetadata
 
 type Link {
   repository: String

@@ -31,7 +31,7 @@ This microservice supports interoperability between the ICDC and other nodes in 
             url,
             repository,
             metadata {
-                ... on IdcMetadata {
+                ... on IDCMetadata {
                     collection_id,
                     cancer_type,
                     date_updated,
@@ -43,7 +43,7 @@ This microservice supports interoperability between the ICDC and other nodes in 
                     subject_count,
                     supporting_data
                 }
-                ... on TciaMetadata {
+                ... on TCIAMetadata {
                     Collection,
                     total_patientIDs,
                     unique_modalities,

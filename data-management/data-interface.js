@@ -122,7 +122,7 @@ async function mapCollectionsToStudies() {
             (obj) => obj.collection_id === idcMatches[match]
           );
           // specify explicit type of metadata returned for GraphQL union
-          idcCollectionMetadata["__typename"] = "IdcMetadata";
+          idcCollectionMetadata["__typename"] = "IDCMetadata";
           collectionUrls.push({
             repository: "IDC",
             url: idcCollectionUrl,
@@ -156,7 +156,7 @@ async function mapCollectionsToStudies() {
             url: tciaCollectionUrl,
             metadata: {
               // specify explicit type of metadata returned for GraphQL union
-              __typename: "TciaMetadata",
+              __typename: "TCIAMetadata",
               Collection: tciaMatches[match],
               total_patientIDs: totalPatients,
               unique_modalities: uniqueModalities,
