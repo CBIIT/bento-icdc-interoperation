@@ -158,10 +158,10 @@ async function mapCollectionsToStudies() {
               // specify explicit type of metadata returned for GraphQL union
               __typename: "TCIAMetadata",
               Collection: tciaMatches[match],
-              total_patientIDs: totalPatients,
+              total_patient_IDs: totalPatients,
               unique_modalities: uniqueModalities,
-              unique_bodypartsExamined: uniqueBodypartsExamined,
-              total_imageCounts: totalImages,
+              unique_bodyparts_examined: uniqueBodypartsExamined,
+              total_image_counts: totalImages,
             },
           });
           numImageCollections++;
