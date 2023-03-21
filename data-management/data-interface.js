@@ -1,5 +1,6 @@
 const fetch = require("node-fetch");
 const { search } = require("fast-fuzzy");
+const { htmlToText } = require("html-to-text");
 const { filterObjectArray } = require("../util/array-util");
 const config = require("../config");
 const {
@@ -121,6 +122,11 @@ async function mapCollectionsToStudies() {
           let idcCollectionMetadata = idcCollections.find(
             (obj) => obj.collection_id === idcMatches[match]
           );
+          const cleanedDescText = htmlToText(
+            idcCollectionMetadata["description"],
+            { wordwrap: null }
+          ).replace(/\r?\n/g, " ");
+          idcCollectionMetadata["description"] = cleanedDescText;
           // specify explicit type of metadata returned for GraphQL union
           idcCollectionMetadata["__typename"] = "IDCMetadata";
           collectionUrls.push({
