@@ -88,7 +88,7 @@ async function getIcdcStudyIds() {
 }
 
 // map image collections to corresponding ICDC studies
-async function mapCollectionsToStudies() {
+async function mapCollectionsToStudies(parameters) {
   try {
     const idcCollections = await getIdcCollections();
     const tciaCollections = await getTciaCollections();
@@ -173,6 +173,12 @@ async function mapCollectionsToStudies() {
           numImageCollections++;
         }
         numCrdcNodes++;
+      }
+      if (
+        parameters.study_code &&
+        parameters.study_code === icdcStudies[study]
+      ) {
+        return collectionUrls;
       }
       if (collectionUrls.length !== 0) {
         collectionMappings.push({

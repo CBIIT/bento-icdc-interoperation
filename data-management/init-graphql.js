@@ -8,6 +8,7 @@ const schema = buildSchema(
 
 const root = {
   studiesByProgram: mapCollectionsToStudies,
+  studyLinks: mapCollectionsToStudies,
 };
 
 module.exports = graphqlHTTP((req, res) => {
@@ -15,8 +16,11 @@ module.exports = graphqlHTTP((req, res) => {
     graphiql: true,
     schema: schema,
     rootValue: root,
-    context: {},
+    context: { req },
     customFormatErrorFn: (error) => {
+      // TODO: improve/enhance app error handling
+      // code in try block below won't throw error
+      // need to throw specific errors in data-interface
       let status;
       let body = { error: undefined };
       try {
@@ -26,7 +30,7 @@ module.exports = graphqlHTTP((req, res) => {
           ` ${JSON.stringify(error.locations).replace(/\"/g, "")}`;
       } catch (err) {
         status = 500;
-        body.error = "Internal server error: " + error;
+        body.error = "Internal server error: " + error.message;
       }
       res.status(status);
       return body;
