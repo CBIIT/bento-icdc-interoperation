@@ -3,6 +3,7 @@ const { search } = require("fast-fuzzy");
 const { htmlToText } = require("html-to-text");
 const { filterObjectArray } = require("../util/array-util");
 const config = require("../config");
+const { errorName } = require("../constants/error-constants");
 const {
   IDC_API_BASE_URL,
   IDC_COLLECTION_BASE_URL,
@@ -11,7 +12,7 @@ const {
   TCIA_COLLECTION_BASE_URL,
   TCIA_API_COLLECTIONS_ENDPOINT,
   TCIA_API_SERIES_ENDPOINT,
-} = require("../constants/interop-constant");
+} = require("../constants/interop-constants");
 
 // fetch and filter IDC image collections
 async function getIdcCollections() {
@@ -88,11 +89,15 @@ async function getIcdcStudyIds() {
 }
 
 // map image collections to corresponding ICDC studies
-async function mapCollectionsToStudies() {
+async function mapCollectionsToStudies(parameters) {
   try {
+    const icdcStudies = await getIcdcStudyIds();
+    if (parameters.study_code && !icdcStudies.includes(parameters.study_code)) {
+      throw new Error(errorName.STUDY_CODE_NOT_FOUND);
+    }
+
     const idcCollections = await getIdcCollections();
     const tciaCollections = await getTciaCollections();
-    const icdcStudies = await getIcdcStudyIds();
 
     let tciaCollectionsData = {};
     let collectionMappings = [];
@@ -173,6 +178,12 @@ async function mapCollectionsToStudies() {
           numImageCollections++;
         }
         numCrdcNodes++;
+      }
+      if (
+        parameters.study_code &&
+        parameters.study_code === icdcStudies[study]
+      ) {
+        return collectionUrls;
       }
       if (collectionUrls.length !== 0) {
         collectionMappings.push({

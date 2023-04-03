@@ -40,4 +40,5 @@ type StudyOfProgram {
 
 type QueryType {
   studiesByProgram: [StudyOfProgram]
+  studyLinks(study_code: String!): [Link]
 }

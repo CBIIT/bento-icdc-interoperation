@@ -1,6 +1,7 @@
 const { buildSchema } = require("graphql");
 const { graphqlHTTP } = require("express-graphql");
 const { mapCollectionsToStudies } = require("./data-interface");
+const { formatErrorResponse } = require("../util/error-util");
 
 const schema = buildSchema(
   require("fs").readFileSync("graphql/schema.graphql", "utf8")
@@ -8,6 +9,7 @@ const schema = buildSchema(
 
 const root = {
   studiesByProgram: mapCollectionsToStudies,
+  studyLinks: mapCollectionsToStudies,
 };
 
 module.exports = graphqlHTTP((req, res) => {
@@ -15,21 +17,9 @@ module.exports = graphqlHTTP((req, res) => {
     graphiql: true,
     schema: schema,
     rootValue: root,
-    context: {},
+    context: { req },
     customFormatErrorFn: (error) => {
-      let status;
-      let body = { error: undefined };
-      try {
-        status = 400;
-        body.error =
-          error.message.replace(/\"/g, "") +
-          ` ${JSON.stringify(error.locations).replace(/\"/g, "")}`;
-      } catch (err) {
-        status = 500;
-        body.error = "Internal server error: " + error;
-      }
-      res.status(status);
-      return body;
+      return formatErrorResponse(res, error);
     },
   };
 });
