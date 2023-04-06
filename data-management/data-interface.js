@@ -130,7 +130,10 @@ async function mapCollectionsToStudies(parameters) {
           const cleanedDescText = htmlToText(
             idcCollectionMetadata["description"],
             { wordwrap: null }
-          ).replace(/\r?\n/g, " ");
+          )
+            .replace(/\n\n|\s*\[.*?\]\s*/g, " ")
+            .replace(/ \./g, ".")
+            .replace(" ICDC-Glioma", "");
           idcCollectionMetadata["description"] = cleanedDescText;
           // specify explicit type of metadata returned for GraphQL union
           idcCollectionMetadata["__typename"] = "IDCMetadata";
