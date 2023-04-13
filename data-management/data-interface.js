@@ -1,9 +1,14 @@
 const fetch = require("node-fetch");
 const { search } = require("fast-fuzzy");
 const { htmlToText } = require("html-to-text");
+const redisClient = require("../redis/redis-client");
 const { filterObjectArray } = require("../util/array-util");
 const config = require("../config");
 const { errorName } = require("../constants/error-constants");
+const {
+  CACHE_DURATION,
+  SET_ONLY_NONEXISTENT_KEYS,
+} = require("../constants/redis-constants");
 const {
   IDC_API_BASE_URL,
   IDC_COLLECTION_BASE_URL,
@@ -84,13 +89,19 @@ async function getIcdcStudyIds() {
     return studyIds;
   } catch (error) {
     console.error(error);
-    return error;
+    throw new Error(errorName.BENTO_BACKEND_NOT_CONNECTED);
   }
 }
 
 // map image collections to corresponding ICDC studies
-async function mapCollectionsToStudies(parameters) {
+async function mapCollectionsToStudies(parameters, context) {
   try {
+    const queryKey = context.req.body.query;
+    const cacheResult = await redisClient.get(queryKey);
+    if (cacheResult) {
+      return JSON.parse(cacheResult);
+    }
+
     const icdcStudies = await getIcdcStudyIds();
     if (parameters.study_code && !icdcStudies.includes(parameters.study_code)) {
       throw new Error(errorName.STUDY_CODE_NOT_FOUND);
@@ -186,6 +197,10 @@ async function mapCollectionsToStudies(parameters) {
         parameters.study_code &&
         parameters.study_code === icdcStudies[study]
       ) {
+        await redisClient.set(queryKey, JSON.stringify(collectionUrls), {
+          EX: CACHE_DURATION,
+          NX: SET_ONLY_NONEXISTENT_KEYS,
+        });
         return collectionUrls;
       }
       if (collectionUrls.length !== 0) {
@@ -197,6 +212,10 @@ async function mapCollectionsToStudies(parameters) {
         });
       }
     }
+    await redisClient.set(queryKey, JSON.stringify(collectionMappings), {
+      EX: CACHE_DURATION,
+      NX: SET_ONLY_NONEXISTENT_KEYS,
+    });
     return collectionMappings;
   } catch (error) {
     console.error(error);
