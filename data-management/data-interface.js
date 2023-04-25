@@ -103,6 +103,7 @@ async function mapCollectionsToStudies(parameters, context) {
       redisClient = redis.createClient(config.REDIS_HOST, config.REDIS_PORT);
       await redisClient.connect();
       redisConnected = true;
+      redisClient.on("error", async (error) => await redisClient.disconnect());
     } catch (error) {
       redisConnected = false;
     }
