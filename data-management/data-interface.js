@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const { search } = require("fast-fuzzy");
 const { htmlToText } = require("html-to-text");
-const redisClient = require("../redis/redis-client");
+const redis = require("redis");
 const { filterObjectArray } = require("../util/array-util");
 const config = require("../config");
 const { errorName } = require("../constants/error-constants");
@@ -88,7 +88,6 @@ async function getIcdcStudyIds() {
     );
     return studyIds;
   } catch (error) {
-    console.error(error);
     throw new Error(errorName.BENTO_BACKEND_NOT_CONNECTED);
   }
 }
@@ -96,10 +95,24 @@ async function getIcdcStudyIds() {
 // map image collections to corresponding ICDC studies
 async function mapCollectionsToStudies(parameters, context) {
   try {
-    const queryKey = context.req.body.query;
-    const cacheResult = await redisClient.get(queryKey);
-    if (cacheResult) {
-      return JSON.parse(cacheResult);
+    let redisConnected;
+    let redisClient;
+    let queryKey;
+
+    try {
+      redisClient = redis.createClient(config.REDIS_HOST, config.REDIS_PORT);
+      await redisClient.connect();
+      redisConnected = true;
+    } catch (error) {
+      redisConnected = false;
+    }
+
+    if (redisConnected) {
+      queryKey = context.req.body.query;
+      const cacheResult = await redisClient.get(queryKey);
+      if (cacheResult) {
+        return JSON.parse(cacheResult);
+      }
     }
 
     const icdcStudies = await getIcdcStudyIds();
@@ -197,10 +210,12 @@ async function mapCollectionsToStudies(parameters, context) {
         parameters.study_code &&
         parameters.study_code === icdcStudies[study]
       ) {
-        await redisClient.set(queryKey, JSON.stringify(collectionUrls), {
-          EX: CACHE_DURATION,
-          NX: SET_ONLY_NONEXISTENT_KEYS,
-        });
+        if (redisConnected) {
+          await redisClient.set(queryKey, JSON.stringify(collectionUrls), {
+            EX: CACHE_DURATION,
+            NX: SET_ONLY_NONEXISTENT_KEYS,
+          });
+        }
         return collectionUrls;
       }
       if (collectionUrls.length !== 0) {
@@ -212,10 +227,12 @@ async function mapCollectionsToStudies(parameters, context) {
         });
       }
     }
-    await redisClient.set(queryKey, JSON.stringify(collectionMappings), {
-      EX: CACHE_DURATION,
-      NX: SET_ONLY_NONEXISTENT_KEYS,
-    });
+    if (redisConnected) {
+      await redisClient.set(queryKey, JSON.stringify(collectionMappings), {
+        EX: CACHE_DURATION,
+        NX: SET_ONLY_NONEXISTENT_KEYS,
+      });
+    }
     return collectionMappings;
   } catch (error) {
     console.error(error);
