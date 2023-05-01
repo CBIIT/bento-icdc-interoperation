@@ -45,10 +45,10 @@ This microservice supports interoperability between the ICDC and other nodes in 
                 }
                 ... on TCIAMetadata {
                     Collection,
-                    total_patientIDs,
+                    total_patient_IDs,
                     unique_modalities,
-                    unique_bodypartsExamined,
-                    total_imageCounts
+                    unique_bodyparts_examined,
+                    total_image_counts
                 }
             }
         },
@@ -76,7 +76,10 @@ This microservice supports interoperability between the ICDC and other nodes in 
                             "collection_id": "icdc_glioma",
                             "cancer_type": "Glioma",
                             "date_updated": "2022-10-10",
-                            "description": "<p><b><a href=\"https://doi.org/10.7937/TCIA.SVQT-Q016\" target=\"_blank\">ICDC-Glioma</a>&#160;</b>contains treatment-na&#239;ve naturally-occurring <b>canine glioma</b> participants from the&#160;<a href=\"https://caninecommons.cancer.gov/#/study/GLIOMA01\">Integrated Canine Data Commons</a>. Brain radiology (57/81 participant animals) and H&amp;E-stained biopsy or necropsy pathology (76/81 participants) are classified by veterinary and physician neuropathologists.<br>&#10;&#9;<br>&#10;&#9;Please see the wiki <a href=\"https://doi.org/10.7937/TCIA.SVQT-Q016\" target=\"_blank\"><b>ICDC-Glioma</b></a>&#160;to learn more about the images and to obtain any supporting metadata for this collection.</p>&#10;",
+                            "description": "ICDC-Glioma contains treatment-naïve naturally-occurring canine glioma participants from
+                                the Integrated Canine Data Commons. Brain radiology (57/81 participant animals) and H&E-stained biopsy or
+                                necropsy pathology (76/81 participants) are classified by veterinary and physician neuropathologists. Please see
+                                the wiki to learn more about the images and to obtain any supporting metadata for this collection.",
                             "doi": "10.7937/tcia.svqt-q016",
                             "image_types": "MR",
                             "location": "Head",
@@ -90,14 +93,14 @@ This microservice supports interoperability between the ICDC and other nodes in 
                         "repository": "TCIA",
                         "metadata": {
                             "Collection": "ICDC-Glioma",
-                            "total_patientIDs": 57,
+                            "total_patient_IDs": 57,
                             "unique_modalities": [
                                 "MR"
                             ],
-                            "unique_bodypartsExamined": [
+                            "unique_bodyparts_examined": [
                                 "HEAD"
                             ],
-                            "total_imageCounts": 17797
+                            "total_image_counts": 17797
                         }
                     }
                 ],
@@ -114,3 +117,5 @@ This microservice supports interoperability between the ICDC and other nodes in 
 ## Environment variables
 
     - BENTO_BACKEND_GRAPHQL_URI: Bento backend URI for GraphQL POST requests
+    - REDIS_HOST: Redis cache host
+    - REDIS_PORT: Redis cache port

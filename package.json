@@ -21,7 +21,8 @@
     "graphql": "^15.8.0",
     "html-to-text": "^9.0.4",
     "morgan": "^1.10.0",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "redis": "^4.6.5"
   },
   "devDependencies": {
     "jest": "^29.2.2",
