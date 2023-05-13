@@ -13,7 +13,7 @@ const { errorName } = require("../constants/error-constants");
 const config = require("../config");
 
 // uploads a manifest CSV to S3 and returns a signed CloudFront URL
-async function uploadManifestToS3(parameters, context) {
+async function uploadManifestToS3(parameters) {
   const s3Client = new S3Client({
     region: AWS_REGION,
     credentials: {
@@ -33,7 +33,11 @@ async function uploadManifestToS3(parameters, context) {
   const uploadParams = {
     Bucket: FILE_MANIFEST_BUCKET_NAME,
     Key: tempCsvFile,
-    Body: fs.readFile(tempCsvFilePath),
+    Body: fs.readFile(tempCsvFilePath, "utf-8", (error) => {
+      if (error) {
+        throw new Error(errorName.MANIFEST_FILE_READ_ERROR);
+      }
+    }),
   };
   const uploadCommand = new PutObjectCommand(uploadParams);
   await s3Client.send(uploadCommand);
