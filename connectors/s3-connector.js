@@ -42,14 +42,12 @@ async function uploadManifestToS3(parameters) {
   const uploadCommand = new PutObjectCommand(uploadParams);
   await s3Client.send(uploadCommand);
 
-  const signedUrl = getSignedUrl({
+  return getSignedUrl({
     keyPairId: config.CLOUDFRONT_KEY_PAIR_ID,
     privateKey: config.CLOUDFRONT_PRIVATE_KEY,
     url: `${CLOUDFRONT_DOMAIN}/${tempCsvFile}`,
     dateLessThan: new Date(Date.now() + 1000 * SIGNED_URL_EXPIRY_SECONDS),
   });
-
-  return signedUrl;
 }
 
 module.exports = uploadManifestToS3;
