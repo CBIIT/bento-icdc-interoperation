@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require("fs").promises;
 const os = require("os");
 const path = require("path");
 const { getSignedUrl } = require("@aws-sdk/cloudfront-signer");
@@ -9,6 +9,10 @@ const {
   CLOUDFRONT_DOMAIN,
   SIGNED_URL_EXPIRY_SECONDS,
 } = require("../constants/aws-constants");
+const {
+  filterObjectArrayByProps,
+  convertObjectArraytoCsv,
+} = require("../util/array-util");
 const { errorName } = require("../constants/error-constants");
 const config = require("../config");
 
@@ -22,22 +26,24 @@ async function uploadManifestToS3(parameters) {
     },
   });
 
+  const filteredManifest = filterObjectArrayByProps(parameters.manifest, [
+    "file_name",
+    "case_id",
+    "study_code",
+    "md5sum",
+  ]);
+  const manifestCsv = convertObjectArraytoCsv(filteredManifest);
+
   const tempCsvFile = `${crypto.randomUUID()}.csv`;
   const tempCsvFilePath = path.join(os.tmpdir(), tempCsvFile);
-  fs.writeFile(tempCsvFilePath, parameters.manifest, (error) => {
-    if (error) {
-      throw new Error(errorName.MANIFEST_FILE_WRITE_ERROR);
-    }
+  await fs.writeFile(tempCsvFilePath, manifestCsv, {
+    encoding: "utf-8",
   });
 
   const uploadParams = {
     Bucket: FILE_MANIFEST_BUCKET_NAME,
     Key: tempCsvFile,
-    Body: fs.readFile(tempCsvFilePath, "utf-8", (error) => {
-      if (error) {
-        throw new Error(errorName.MANIFEST_FILE_READ_ERROR);
-      }
-    }),
+    Body: await fs.readFile(tempCsvFilePath, { encoding: "utf-8" }),
   };
   const uploadCommand = new PutObjectCommand(uploadParams);
   await s3Client.send(uploadCommand);
