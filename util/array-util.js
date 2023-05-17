@@ -13,7 +13,7 @@ module.exports = {
         }, {})
     );
   },
-  convertObjectArraytoCsv(objectArray) {
+  convertObjectArrayToCsv(objectArray) {
     arrayWithHeaders = [Object.keys(objectArray[0])].concat(objectArray);
     return arrayWithHeaders
       .map((item) => {
