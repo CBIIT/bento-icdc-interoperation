@@ -28,10 +28,10 @@ async function uploadManifestToS3(parameters) {
     });
 
     const filteredManifest = filterObjectArrayByProps(parameters.manifest, [
-      "file_name",
-      "case_id",
+      "name",
+      "drs_uri",
       "study_code",
-      "md5sum",
+      "case_id",
     ]);
     const manifestCsv = convertObjectArrayToCsv(filteredManifest);
 
