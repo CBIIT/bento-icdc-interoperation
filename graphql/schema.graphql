@@ -9,16 +9,16 @@ input FileInList {
   file_description: String
   file_format: String
   file_size: Float
-  case_id: String!
+  case_id: String
   breed: String
   diagnosis: String
-  study_code: String!
+  study_code: String
   file_uuid: String
   md5sum: String
   sample_id: String
   individual_id: String
-  name: String!
-  drs_uri: String!
+  name: String
+  drs_uri: String
 }
 
 type IDCMetadata {

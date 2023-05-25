@@ -5,12 +5,6 @@ const path = require("path");
 const { getSignedUrl } = require("@aws-sdk/cloudfront-signer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const {
-  FILE_MANIFEST_BUCKET_NAME,
-  AWS_REGION,
-  CLOUDFRONT_DOMAIN,
-  SIGNED_URL_EXPIRY_SECONDS,
-} = require("../constants/aws-constants");
-const {
   filterObjectArrayByProps,
   convertObjectArrayToCsv,
 } = require("../util/array-util");
@@ -20,7 +14,7 @@ const config = require("../config");
 async function uploadManifestToS3(parameters) {
   try {
     const s3Client = new S3Client({
-      region: AWS_REGION,
+      region: config.AWS_REGION,
       credentials: {
         accessKeyId: config.S3_ACCESS_KEY_ID,
         secretAccessKey: config.S3_SECRET_ACCESS_KEY,
@@ -42,7 +36,7 @@ async function uploadManifestToS3(parameters) {
     });
 
     const uploadParams = {
-      Bucket: FILE_MANIFEST_BUCKET_NAME,
+      Bucket: config.FILE_MANIFEST_BUCKET_NAME,
       Key: tempCsvFile,
       Body: await fs.readFile(tempCsvFilePath, { encoding: "utf-8" }),
     };
@@ -52,8 +46,10 @@ async function uploadManifestToS3(parameters) {
     return getSignedUrl({
       keyPairId: config.CLOUDFRONT_KEY_PAIR_ID,
       privateKey: config.CLOUDFRONT_PRIVATE_KEY,
-      url: `${CLOUDFRONT_DOMAIN}/${tempCsvFile}`,
-      dateLessThan: new Date(Date.now() + 1000 * SIGNED_URL_EXPIRY_SECONDS),
+      url: `${config.CLOUDFRONT_DOMAIN}/${tempCsvFile}`,
+      dateLessThan: new Date(
+        Date.now() + 1000 * config.SIGNED_URL_EXPIRY_SECONDS
+      ),
     });
   } catch (error) {
     console.error(error);
