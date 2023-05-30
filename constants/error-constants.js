@@ -10,8 +10,7 @@ exports.errorType = {
     statusCode: 404,
   },
   BENTO_BACKEND_NOT_CONNECTED: {
-    message:
-      "The application was unable to connect to a Bento backend instance.",
+    message: "The server was unable to connect to a Bento backend instance.",
     statusCode: 503,
   },
 };
