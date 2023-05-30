@@ -33,7 +33,7 @@ function scanConfigObject(configObject) {
       unsetVars.push(filteredKeys[key]);
     }
   }
-  if (!(unsetVars.length === 0)) {
+  if (unsetVars.length !== 0) {
     throw new Error(
       `The following environment variables are not set: ${unsetVars.join(", ")}`
     );
