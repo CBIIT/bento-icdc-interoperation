@@ -4,10 +4,7 @@ const os = require("os");
 const path = require("path");
 const { getSignedUrl } = require("@aws-sdk/cloudfront-signer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const {
-  filterObjectArrayByProps,
-  convertObjectArrayToCsv,
-} = require("../util/array-util");
+const { convertObjectArrayToCsv } = require("../util/array-util");
 const config = require("../config");
 
 // uploads a manifest CSV to S3 and returns a signed CloudFront URL
@@ -21,14 +18,7 @@ async function uploadManifestToS3(parameters) {
       },
     });
 
-    const filteredManifest = filterObjectArrayByProps(parameters.manifest, [
-      "name",
-      "drs_uri",
-      "study_code",
-      "case_id",
-    ]);
-    const manifestCsv = convertObjectArrayToCsv(filteredManifest);
-
+    const manifestCsv = convertObjectArrayToCsv(parameters.manifest);
     const tempCsvFile = `${randomUUID()}.csv`;
     const tempCsvFilePath = path.join(os.tmpdir(), tempCsvFile);
     await fs.writeFile(tempCsvFilePath, manifestCsv, {
