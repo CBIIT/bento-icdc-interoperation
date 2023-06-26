@@ -49,8 +49,7 @@ async function getTciaCollections() {
     const collectionIds = filtered.map((obj) => obj.Collection);
     return collectionIds;
   } catch (error) {
-    console.error(error);
-    return error;
+    throw new Error(errorName.TCIA_API_QUERY_ERROR);
   }
 }
 
@@ -63,8 +62,7 @@ async function getTciaCollectionData(collection_id) {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error(error);
-    return error;
+    throw new Error(errorName.TCIA_API_QUERY_ERROR);
   }
 }
 
