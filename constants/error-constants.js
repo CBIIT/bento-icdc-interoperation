@@ -16,6 +16,6 @@ exports.errorType = {
   },
   TCIA_API_QUERY_ERROR: {
     message: "The server was unable to query data from the TCIA API",
-    statusCode: 503,
+    statusCode: 200,
   },
 };
