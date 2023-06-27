@@ -18,7 +18,9 @@ async function uploadManifestToS3(parameters) {
       },
     });
 
-    const manifestCsv = convertObjectArrayToCsv(parameters.manifest);
+    const manifestCsv = convertObjectArrayToCsv(
+      JSON.parse(parameters.manifest)
+    );
     const tempCsvFile = `${randomUUID()}.csv`;
     const tempCsvFilePath = path.join(os.tmpdir(), tempCsvFile);
     await fs.writeFile(tempCsvFilePath, manifestCsv, {
