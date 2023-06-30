@@ -45,6 +45,7 @@ async function uploadManifestToS3(parameters) {
     });
   } catch (error) {
     console.error(error);
+    return error;
   }
 }
 
