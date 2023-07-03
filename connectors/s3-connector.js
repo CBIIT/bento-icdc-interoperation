@@ -6,6 +6,7 @@ const { getSignedUrl } = require("@aws-sdk/cloudfront-signer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { convertObjectArrayToCsv } = require("../util/array-util");
 const config = require("../config");
+const { errorName } = require("../constants/error-constants");
 
 // uploads a manifest CSV to S3 and returns a signed CloudFront URL
 async function uploadManifestToS3(parameters) {
@@ -18,9 +19,12 @@ async function uploadManifestToS3(parameters) {
       },
     });
 
-    const manifestCsv = convertObjectArrayToCsv(
-      JSON.parse(parameters.manifest)
-    );
+    const parsedManifest = JSON.parse(parameters.manifest);
+    if (!Array.isArray(parsedManifest) || !parsedManifest) {
+      throw new Error(errorName.MALFORMED_FILE_MANIFEST);
+    }
+
+    const manifestCsv = convertObjectArrayToCsv(parameters.manifest);
     const tempCsvFile = `${randomUUID()}.csv`;
     const tempCsvFilePath = path.join(os.tmpdir(), tempCsvFile);
     await fs.writeFile(tempCsvFilePath, manifestCsv, {
