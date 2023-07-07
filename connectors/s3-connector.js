@@ -24,7 +24,7 @@ async function uploadManifestToS3(parameters) {
       throw new Error(errorName.MALFORMED_FILE_MANIFEST);
     }
 
-    const manifestCsv = convertObjectArrayToCsv(parameters.manifest);
+    const manifestCsv = convertObjectArrayToCsv(parsedManifest);
     const tempCsvFile = `${randomUUID()}.csv`;
     const tempCsvFilePath = path.join(os.tmpdir(), tempCsvFile);
     await fs.writeFile(tempCsvFilePath, manifestCsv, {
