@@ -20,21 +20,5 @@ module.exports = {
         return Object.values(item).toString();
       })
       .join("\n");
-
-    //   console.error("objectArray:  ", objectArray);
-    // console.error("objectArray type:  ", typeof objectArray);
-    // console.error("objectArray length:  ", objectArray.length);
-    // try {
-    //   arrayWithHeaders = [Object.keys(objectArray[0])].concat(objectArray);
-    //   console.error(arrayWithHeaders);
-    //   return arrayWithHeaders
-    //     .map((item) => {
-    //       return Object.values(item).toString();
-    //     })
-    //     .join("\n");
-    // } catch (error) {
-    //   console.error(error);
-    //   return error;
-    // }
   },
 };
