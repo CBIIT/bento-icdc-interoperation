@@ -155,12 +155,17 @@ async function mapCollectionsToStudies(parameters, context) {
           const cleanedDescText = htmlToText(
             idcCollectionMetadata["description"],
             { wordwrap: null }
-          )
-            .replace(/\n\n|\s*\[.*?\]\s*/g, " ")
-            .replace(/ \./g, ".")
-            .replace(" ICDC-Glioma", "");
-          idcCollectionMetadata["description"] = cleanedDescText;
-          // specify explicit type of metadata returned for GraphQL union
+          );
+          // handle oddly-formatted response HTML for GLIOMA01
+          if (icdcStudies[study] === "GLIOMA01") {
+            idcCollectionMetadata["description"] = cleanedDescText
+              .replace(/\n\n|\s*\[.*?\]\s*/g, " ")
+              .replace(/ \./g, ".")
+              .replace(" ICDC-Glioma", "");
+          } else {
+            idcCollectionMetadata["description"] = cleanedDescText;
+          }
+          // specify explicit metadata type returned for GraphQL union
           idcCollectionMetadata["__typename"] = "IDCMetadata";
           collectionUrls.push({
             repository: "IDC",
@@ -175,7 +180,7 @@ async function mapCollectionsToStudies(parameters, context) {
         for (match in tciaMatches) {
           const tciaCollectionUrl = `${TCIA_COLLECTION_BASE_URL}${tciaMatches[match]}`;
           let tciaCollectionMetadata = tciaCollectionsData[tciaMatches[match]];
-          const totalImages = tciaCollectionMetadata.reduce(
+          let totalImages = tciaCollectionMetadata.reduce(
             (tot, obj) => tot + parseInt(obj.ImageCount),
             0
           );
@@ -190,11 +195,16 @@ async function mapCollectionsToStudies(parameters, context) {
               tciaCollectionMetadata.map((obj) => obj.BodyPartExamined)
             ),
           ];
+          // hardcode inaccessible TCIA data for GLIOMA01
+          if (icdcStudies[study] === "GLIOMA01") {
+            uniqueModalities.push("Histopathology");
+            totalImages += 84;
+          }
           collectionUrls.push({
             repository: "TCIA",
             url: tciaCollectionUrl,
             metadata: {
-              // specify explicit type of metadata returned for GraphQL union
+              // specify explicit metadata type returned for GraphQL union
               __typename: "TCIAMetadata",
               Collection: tciaMatches[match],
               total_patient_IDs: totalPatients,
