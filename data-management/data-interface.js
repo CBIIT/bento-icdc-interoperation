@@ -100,7 +100,19 @@ async function mapCollectionsToStudies(parameters, context) {
     let queryKey;
 
     try {
-      redisClient = redis.createClient(config.REDIS_HOST, config.REDIS_PORT);
+      if (config.REDIS_AUTH_ENABLED.toLowerCase() === "true") {
+        redisClient = redis.createClient({
+          host: config.REDIS_HOST,
+          port: config.REDIS_PORT,
+          username: config.REDIS_USERNAME,
+          password: config.REDIS_PASSWORD,
+        });
+      } else {
+        redisClient = redis.createClient({
+          host: config.REDIS_HOST,
+          port: config.REDIS_PORT,
+        });
+      }
       await redisClient.connect();
       redisConnected = true;
       redisClient.on("error", async (error) => await redisClient.disconnect());
