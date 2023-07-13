@@ -16,7 +16,6 @@ const config = {
   CLOUDFRONT_DOMAIN: process.env.CLOUDFRONT_DOMAIN,
   SIGNED_URL_EXPIRY_SECONDS: process.env.SIGNED_URL_EXPIRY_SECONDS,
   REDIS_AUTH_ENABLED: process.env.REDIS_AUTH_ENABLED,
-  REDIS_USERNAME: process.env.REDIS_USERNAME,
   REDIS_PASSWORD: process.env.REDIS_PASSWORD,
 };
 
@@ -33,7 +32,7 @@ function scanConfigObject(configObject) {
   });
   if (configObject.REDIS_AUTH_ENABLED.toLowerCase() === "false") {
     filteredKeys = filteredKeys.filter((key) => {
-      return !["REDIS_USERNAME", "REDIS_PASSWORD"].includes(key);
+      return !["REDIS_PASSWORD"].includes(key);
     });
   }
   for (key in filteredKeys) {
