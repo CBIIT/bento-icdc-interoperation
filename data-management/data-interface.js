@@ -116,6 +116,7 @@ async function mapCollectionsToStudies(parameters, context) {
       redisConnected = true;
       redisClient.on("error", async (error) => await redisClient.disconnect());
     } catch (error) {
+      console.error(error);
       redisConnected = false;
     }
 
