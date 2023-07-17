@@ -20,7 +20,7 @@ async function uploadManifestToS3(parameters) {
     });
 
     const parsedManifest = JSON.parse(parameters.manifest);
-    if (!Array.isArray(parsedManifest) || !parsedManifest) {
+    if (!parsedManifest || !Array.isArray(parsedManifest)) {
       throw new Error(errorName.MALFORMED_FILE_MANIFEST);
     }
 
