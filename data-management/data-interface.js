@@ -34,7 +34,7 @@ async function getIdcCollections() {
     return filteredCollections;
   } catch (error) {
     console.error(error);
-    return error;
+    throw new Error(errorName.IDC_INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -50,7 +50,7 @@ async function getTciaCollections() {
     return collectionIds;
   } catch (error) {
     console.error(error);
-    return error;
+    throw new Error(errorName.TCIA_INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -64,7 +64,7 @@ async function getTciaCollectionData(collection_id) {
     return data;
   } catch (error) {
     console.error(error);
-    return error;
+    throw new Error(errorName.TCIA_INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -88,6 +88,7 @@ async function getIcdcStudyIds() {
     );
     return studyIds;
   } catch (error) {
+    console.error(error);
     throw new Error(errorName.BENTO_BACKEND_NOT_CONNECTED);
   }
 }
