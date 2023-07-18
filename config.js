@@ -30,9 +30,12 @@ function scanConfigObject(configObject) {
   let filteredKeys = Object.keys(configObject).filter((key) => {
     return !["date", "version"].includes(key);
   });
-  if (configObject.REDIS_AUTH_ENABLED.toLowerCase() === "false") {
+  if (
+    !configObject.REDIS_AUTH_ENABLED ||
+    configObject.REDIS_AUTH_ENABLED.toLowerCase() !== "true"
+  ) {
     filteredKeys = filteredKeys.filter((key) => {
-      return !["REDIS_PASSWORD"].includes(key);
+      return !["REDIS_AUTH_ENABLED", "REDIS_PASSWORD"].includes(key);
     });
   }
   for (key in filteredKeys) {
