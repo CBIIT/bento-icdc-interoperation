@@ -101,7 +101,7 @@ async function mapCollectionsToStudies(parameters, context) {
     let queryKey;
 
     try {
-      if (config.REDIS_AUTH_ENABLED.toLowerCase() === "false") {
+      if (config.REDIS_AUTH_ENABLED.toLowerCase() !== "true") {
         redisClient = redis.createClient({
           host: config.REDIS_HOST,
           port: config.REDIS_PORT,

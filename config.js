@@ -32,7 +32,7 @@ function scanConfigObject(configObject) {
   });
   if (
     !configObject.REDIS_AUTH_ENABLED ||
-    configObject.REDIS_AUTH_ENABLED.toLowerCase() === "false"
+    configObject.REDIS_AUTH_ENABLED.toLowerCase() !== "true"
   ) {
     filteredKeys = filteredKeys.filter((key) => {
       return !["REDIS_AUTH_ENABLED", "REDIS_PASSWORD"].includes(key);
