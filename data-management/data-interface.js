@@ -34,7 +34,7 @@ async function getIdcCollections() {
     return filteredCollections;
   } catch (error) {
     console.error(error);
-    throw new Error(errorName.IDC_INTERNAL_SERVER_ERROR);
+    return [];
   }
 }
 
@@ -50,7 +50,7 @@ async function getTciaCollections() {
     return collectionIds;
   } catch (error) {
     console.error(error);
-    throw new Error(errorName.TCIA_INTERNAL_SERVER_ERROR);
+    return [];
   }
 }
 
@@ -64,7 +64,7 @@ async function getTciaCollectionData(collection_id) {
     return data;
   } catch (error) {
     console.error(error);
-    throw new Error(errorName.TCIA_INTERNAL_SERVER_ERROR);
+    return [];
   }
 }
 
@@ -186,49 +186,52 @@ async function mapCollectionsToStudies(parameters, context) {
             metadata: idcCollectionMetadata,
           });
           numImageCollections++;
+          numCrdcNodes++;
         }
-        numCrdcNodes++;
       }
       if (tciaMatches.length !== 0) {
         for (match in tciaMatches) {
-          const tciaCollectionUrl = `${TCIA_COLLECTION_BASE_URL}${tciaMatches[match]}`;
-          let tciaCollectionMetadata = tciaCollectionsData[tciaMatches[match]];
-          let totalImages = tciaCollectionMetadata.reduce(
-            (tot, obj) => tot + parseInt(obj.ImageCount),
-            0
-          );
-          const totalPatients = [
-            ...new Set(tciaCollectionMetadata.map((obj) => obj.PatientID)),
-          ].length;
-          const uniqueModalities = [
-            ...new Set(tciaCollectionMetadata.map((obj) => obj.Modality)),
-          ];
-          const uniqueBodypartsExamined = [
-            ...new Set(
-              tciaCollectionMetadata.map((obj) => obj.BodyPartExamined)
-            ),
-          ];
-          // hardcode inaccessible TCIA data for GLIOMA01
-          if (icdcStudies[study] === "GLIOMA01") {
-            uniqueModalities.push("Histopathology");
-            totalImages += 84;
+          if (tciaCollectionsData[tciaMatches[match]].length !== 0) {
+            const tciaCollectionUrl = `${TCIA_COLLECTION_BASE_URL}${tciaMatches[match]}`;
+            let tciaCollectionMetadata =
+              tciaCollectionsData[tciaMatches[match]];
+            let totalImages = tciaCollectionMetadata.reduce(
+              (tot, obj) => tot + parseInt(obj.ImageCount),
+              0
+            );
+            const totalPatients = [
+              ...new Set(tciaCollectionMetadata.map((obj) => obj.PatientID)),
+            ].length;
+            const uniqueModalities = [
+              ...new Set(tciaCollectionMetadata.map((obj) => obj.Modality)),
+            ];
+            const uniqueBodypartsExamined = [
+              ...new Set(
+                tciaCollectionMetadata.map((obj) => obj.BodyPartExamined)
+              ),
+            ];
+            // hardcode inaccessible TCIA data for GLIOMA01
+            if (icdcStudies[study] === "GLIOMA01") {
+              uniqueModalities.push("Histopathology");
+              totalImages += 84;
+            }
+            collectionUrls.push({
+              repository: "TCIA",
+              url: tciaCollectionUrl,
+              metadata: {
+                // specify explicit metadata type returned for GraphQL union
+                __typename: "TCIAMetadata",
+                Collection: tciaMatches[match],
+                total_patient_IDs: totalPatients,
+                unique_modalities: uniqueModalities,
+                unique_bodyparts_examined: uniqueBodypartsExamined,
+                total_image_counts: totalImages,
+              },
+            });
+            numImageCollections++;
+            numCrdcNodes++;
           }
-          collectionUrls.push({
-            repository: "TCIA",
-            url: tciaCollectionUrl,
-            metadata: {
-              // specify explicit metadata type returned for GraphQL union
-              __typename: "TCIAMetadata",
-              Collection: tciaMatches[match],
-              total_patient_IDs: totalPatients,
-              unique_modalities: uniqueModalities,
-              unique_bodyparts_examined: uniqueBodypartsExamined,
-              total_image_counts: totalImages,
-            },
-          });
-          numImageCollections++;
         }
-        numCrdcNodes++;
       }
       if (
         parameters.study_code &&
