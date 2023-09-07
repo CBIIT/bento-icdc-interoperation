@@ -2,9 +2,9 @@ const { randomUUID } = require("crypto");
 const fs = require("fs").promises;
 const os = require("os");
 const path = require("path");
+const converter = require("json-2-csv");
 const { getSignedUrl } = require("@aws-sdk/cloudfront-signer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const { convertObjectArrayToCsv } = require("../util/array-util");
 const config = require("../config");
 const { errorName } = require("../constants/error-constants");
 
@@ -24,7 +24,7 @@ async function uploadManifestToS3(parameters) {
       throw new Error(errorName.MALFORMED_FILE_MANIFEST);
     }
 
-    const manifestCsv = convertObjectArrayToCsv(parsedManifest);
+    const manifestCsv = await converter.json2csv(parsedManifest);
     const tempCsvFile = `${randomUUID()}.csv`;
     const tempCsvFilePath = path.join(os.tmpdir(), tempCsvFile);
     await fs.writeFile(tempCsvFilePath, manifestCsv, {
