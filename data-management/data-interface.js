@@ -247,10 +247,7 @@ async function mapCollectionsToStudies(parameters, context) {
         }
         return collectionUrls;
       }
-      if (
-        icdcStudies[study].numberOfCRDCNodes !== 0 ||
-        icdcStudies[study].numberOfImageCollections !== 0
-      ) {
+      if (icdcStudies[study].numberOfCRDCNodes !== 0) {
         collectionMappings.push({
           CRDCLinks: collectionUrls,
           numberOfCRDCNodes: icdcStudies[study].numberOfCRDCNodes,
