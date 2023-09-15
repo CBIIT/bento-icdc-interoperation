@@ -192,6 +192,11 @@ async function mapCollectionsToStudies(parameters, context) {
             metadata: idcCollectionMetadata,
           });
         }
+      } else {
+        collectionUrls.push({
+          repository: "IDC",
+          url: "API failed",
+        });
       }
       if (tciaMatches.length !== 0) {
         for (match in tciaMatches) {
@@ -232,8 +237,18 @@ async function mapCollectionsToStudies(parameters, context) {
                 total_image_counts: totalImages,
               },
             });
+          } else {
+            collectionUrls.push({
+              repository: "TCIA",
+              url: "API failed",
+            });
           }
         }
+      } else {
+        collectionUrls.push({
+          repository: "TCIA",
+          url: "API failed",
+        });
       }
       if (
         parameters.study_code &&
