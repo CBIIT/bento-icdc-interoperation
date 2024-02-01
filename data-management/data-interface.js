@@ -131,7 +131,7 @@ async function mapCollectionsToStudies(parameters, context) {
 
     const icdcStudies = await getIcdcStudyData();
     if (
-      parameters.study_code &&
+      parameters.study_code.length >= 0 &&
       !icdcStudies
         .map((obj) => obj.clinical_study_designation)
         .includes(parameters.study_code)
