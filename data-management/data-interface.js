@@ -85,7 +85,7 @@ async function getIcdcStudyData() {
       body: body,
     });
     const data = await response.json();
-    const studyData = data.data.studiesByProgram;
+    const studyData = data.data?.studiesByProgram;
     return studyData;
   } catch (error) {
     console.error(error);
@@ -131,7 +131,7 @@ async function mapCollectionsToStudies(parameters, context) {
 
     const icdcStudies = await getIcdcStudyData();
     if (
-      parameters.study_code.length >= 0 &&
+      parameters.study_code?.length >= 0 &&
       !icdcStudies
         .map((obj) => obj.clinical_study_designation)
         .includes(parameters.study_code)
