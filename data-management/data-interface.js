@@ -69,12 +69,14 @@ async function getTciaCollectionData(collection_id) {
 }
 
 // fetch ICDC study IDs via Bento Backend API
-async function getIcdcStudyIds() {
+async function getIcdcStudyData() {
   try {
     const body = JSON.stringify({
       query: `{
               studiesByProgram {
                   clinical_study_designation
+                  numberOfImageCollections
+                  numberOfCRDCNodes
               }
           }`,
     });
@@ -83,10 +85,8 @@ async function getIcdcStudyIds() {
       body: body,
     });
     const data = await response.json();
-    const studyIds = data.data.studiesByProgram.map(
-      (obj) => obj.clinical_study_designation
-    );
-    return studyIds;
+    const studyData = data.data?.studiesByProgram;
+    return studyData;
   } catch (error) {
     console.error(error);
     throw new Error(errorName.BENTO_BACKEND_NOT_CONNECTED);
@@ -129,8 +129,13 @@ async function mapCollectionsToStudies(parameters, context) {
       }
     }
 
-    const icdcStudies = await getIcdcStudyIds();
-    if (parameters.study_code && !icdcStudies.includes(parameters.study_code)) {
+    const icdcStudies = await getIcdcStudyData();
+    if (
+      parameters.study_code?.length >= 0 &&
+      !icdcStudies
+        .map((obj) => obj.clinical_study_designation)
+        .includes(parameters.study_code)
+    ) {
       throw new Error(errorName.STUDY_CODE_NOT_FOUND);
     }
 
@@ -150,14 +155,15 @@ async function mapCollectionsToStudies(parameters, context) {
     for (study in icdcStudies) {
       // fuzzy match strings using damerau-levenshtein distance
       let idcMatches = search(
-        icdcStudies[study],
+        icdcStudies[study]?.clinical_study_designation,
         idcCollections.map((obj) => obj.collection_id)
       );
-      let tciaMatches = search(icdcStudies[study], tciaCollections);
+      let tciaMatches = search(
+        icdcStudies[study]?.clinical_study_designation,
+        tciaCollections
+      );
 
       let collectionUrls = [];
-      let numCrdcNodes = 0;
-      let numImageCollections = 0;
 
       if (idcMatches.length !== 0) {
         for (match in idcMatches) {
@@ -170,7 +176,7 @@ async function mapCollectionsToStudies(parameters, context) {
             { wordwrap: null }
           );
           // handle oddly-formatted response HTML for GLIOMA01
-          if (icdcStudies[study] === "GLIOMA01") {
+          if (icdcStudies[study]?.clinical_study_designation === "GLIOMA01") {
             idcCollectionMetadata["description"] = cleanedDescText
               .replace(/\n\n|\s*\[.*?\]\s*/g, " ")
               .replace(/ \./g, ".")
@@ -178,20 +184,22 @@ async function mapCollectionsToStudies(parameters, context) {
           } else {
             idcCollectionMetadata["description"] = cleanedDescText;
           }
-          // specify explicit metadata type returned for GraphQL union
           idcCollectionMetadata["__typename"] = "IDCMetadata";
           collectionUrls.push({
             repository: "IDC",
             url: idcCollectionUrl,
             metadata: idcCollectionMetadata,
           });
-          numImageCollections++;
-          numCrdcNodes++;
         }
+      } else {
+        collectionUrls.push({
+          repository: "IDC",
+          url: "API failed",
+        });
       }
       if (tciaMatches.length !== 0) {
         for (match in tciaMatches) {
-          if (tciaCollectionsData[tciaMatches[match]].length !== 0) {
+          if (tciaCollectionsData[tciaMatches[match]]?.length > 0) {
             const tciaCollectionUrl = `${TCIA_COLLECTION_BASE_URL}${tciaMatches[match]}`;
             let tciaCollectionMetadata =
               tciaCollectionsData[tciaMatches[match]];
@@ -211,7 +219,7 @@ async function mapCollectionsToStudies(parameters, context) {
               ),
             ];
             // hardcode inaccessible TCIA data for GLIOMA01
-            if (icdcStudies[study] === "GLIOMA01") {
+            if (icdcStudies[study]?.clinical_study_designation === "GLIOMA01") {
               uniqueModalities.push("Histopathology");
               totalImages += 84;
             }
@@ -219,7 +227,6 @@ async function mapCollectionsToStudies(parameters, context) {
               repository: "TCIA",
               url: tciaCollectionUrl,
               metadata: {
-                // specify explicit metadata type returned for GraphQL union
                 __typename: "TCIAMetadata",
                 Collection: tciaMatches[match],
                 total_patient_IDs: totalPatients,
@@ -228,14 +235,22 @@ async function mapCollectionsToStudies(parameters, context) {
                 total_image_counts: totalImages,
               },
             });
-            numImageCollections++;
-            numCrdcNodes++;
+          } else {
+            collectionUrls.push({
+              repository: "TCIA",
+              url: "API failed",
+            });
           }
         }
+      } else {
+        collectionUrls.push({
+          repository: "TCIA",
+          url: "API failed",
+        });
       }
       if (
         parameters.study_code &&
-        parameters.study_code === icdcStudies[study]
+        parameters.study_code === icdcStudies[study]?.clinical_study_designation
       ) {
         if (redisConnected) {
           await redisClient.set(queryKey, JSON.stringify(collectionUrls), {
@@ -245,12 +260,14 @@ async function mapCollectionsToStudies(parameters, context) {
         }
         return collectionUrls;
       }
-      if (collectionUrls.length !== 0) {
+      if (icdcStudies[study]?.numberOfCRDCNodes > 0) {
         collectionMappings.push({
           CRDCLinks: collectionUrls,
-          numberOfCRDCNodes: numCrdcNodes,
-          numberOfImageCollections: numImageCollections,
-          clinical_study_designation: icdcStudies[study],
+          numberOfCRDCNodes: icdcStudies[study]?.numberOfCRDCNodes,
+          numberOfImageCollections:
+            icdcStudies[study]?.numberOfImageCollections,
+          clinical_study_designation:
+            icdcStudies[study]?.clinical_study_designation,
         });
       }
     }
@@ -270,6 +287,6 @@ async function mapCollectionsToStudies(parameters, context) {
 module.exports = {
   getIdcCollections,
   getTciaCollections,
-  getIcdcStudyIds,
+  getIcdcStudyData,
   mapCollectionsToStudies,
 };

@@ -26,6 +26,7 @@ app.use(
       "https://caninecommons-qa.cancer.gov",
       "https://caninecommons-stage.cancer.gov",
       "https://caninecommons.cancer.gov",
+      "https://caninecommons-test.cancer.gov",
     ],
   })
 );
