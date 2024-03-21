@@ -112,9 +112,11 @@ async function mapCollectionsToStudies(parameters, context) {
         });
       } else {
         redisClient = redis.createClient({
-          host: config.REDIS_HOST,
-          port: config.REDIS_PORT,
-          password: config.REDIS_PASSWORD,
+          socket: {
+            host: config.REDIS_HOST,
+            port: config.REDIS_PORT,
+            password: config.REDIS_PASSWORD,
+          },
         });
       }
       await redisClient.connect();
