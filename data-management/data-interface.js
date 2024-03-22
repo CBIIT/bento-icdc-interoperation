@@ -100,10 +100,6 @@ async function mapCollectionsToStudies(parameters, context) {
     let redisClient;
     let queryKey;
 
-    console.log(">>> >>> >>>  ", config.REDIS_AUTH_ENABLED);
-    console.log(">>> >>> >>>  ", config.REDIS_HOST);
-    console.log(">>> >>> >>>  ", config.REDIS_PORT);
-
     try {
       if (config.REDIS_AUTH_ENABLED.toLowerCase() !== "true") {
         redisClient = redis.createClient({
@@ -115,13 +111,22 @@ async function mapCollectionsToStudies(parameters, context) {
           socket: {
             host: config.REDIS_HOST,
             port: config.REDIS_PORT,
-            password: config.REDIS_PASSWORD,
           },
+          password: config.REDIS_PASSWORD,
         });
       }
+      redisClient.on("error", async (error) => {
+        console.log("*****REDIS CONNECT ERROR*****", error);
+        await redisClient.disconnect();
+      });
+      redisClient.on("connect", () => console.log("*****REDIS CONNECTED*****"));
+      redisClient.on("ready", () => console.log("*****REDIS READY*****"));
+      redisClient.on("reconnecting", () =>
+        console.log("*****REDIS RECONNECTING*****")
+      );
       await redisClient.connect();
       redisConnected = true;
-      redisClient.on("error", async (error) => await redisClient.disconnect());
+      // redisClient.on("error", async (error) => await redisClient.disconnect());
     } catch (error) {
       console.error(error);
       redisConnected = false;
