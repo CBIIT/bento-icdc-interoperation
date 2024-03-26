@@ -8,7 +8,16 @@ const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const config = require("../config");
 const { errorName } = require("../constants/error-constants");
 
-// uploads a manifest CSV to S3 and returns a signed CloudFront URL
+/**
+ * Transforms array of JSON strings representing file manifest
+ * into CSV, uploads to S3 bucket and returns pre-signed CloudFront URL.
+ *
+ * @async
+ * @param {Object} parameters - Parameters object.
+ * @param {string[]} parameters.manifest - Array of JSON strings.
+ * @returns {Promise<string>} - Promise that resolves to a pre-signed CloudFront URL.
+ * @throws {Error} - Throws error if file manifest is not an array of JSON strings.
+ */
 async function uploadManifestToS3(parameters) {
   try {
     const s3Client = new S3Client({
