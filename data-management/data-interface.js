@@ -116,17 +116,11 @@ async function mapCollectionsToStudies(parameters, context) {
         });
       }
       redisClient.on("error", async (error) => {
-        console.log("*****REDIS CONNECT ERROR*****", error);
+        console.error(error);
         await redisClient.disconnect();
       });
-      redisClient.on("connect", () => console.log("*****REDIS CONNECTED*****"));
-      redisClient.on("ready", () => console.log("*****REDIS READY*****"));
-      redisClient.on("reconnecting", () =>
-        console.log("*****REDIS RECONNECTING*****")
-      );
       await redisClient.connect();
       redisConnected = true;
-      // redisClient.on("error", async (error) => await redisClient.disconnect());
     } catch (error) {
       console.error(error);
       redisConnected = false;
