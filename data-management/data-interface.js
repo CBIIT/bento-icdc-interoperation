@@ -19,7 +19,12 @@ const {
   TCIA_API_SERIES_ENDPOINT,
 } = require("../constants/interop-constants");
 
-// fetch and filter IDC image collections
+/**
+ * Retrieves image collection data from the IDC API and filters for collections relevant to ICDC.
+ *
+ * @async
+ * @returns {Promise<string[]>} - Promise that resolves with an array of IDC collections.
+ */
 async function getIdcCollections() {
   try {
     const response = await fetch(
@@ -38,7 +43,12 @@ async function getIdcCollections() {
   }
 }
 
-// fetch and filter TCIA image collection IDs
+/**
+ * Retrieves image collection data from the TCIA API and filters for collection IDs relevant to ICDC.
+ *
+ * @async
+ * @returns {Promise<string[]>} - Promise that resolves with an array of TCIA collection IDs.
+ */
 async function getTciaCollections() {
   try {
     const response = await fetch(
@@ -54,7 +64,13 @@ async function getTciaCollections() {
   }
 }
 
-// fetch specific TCIA image collection metadata
+/**
+ * Retrieves data from TCIA API for a specific TCIA image collection.
+ *
+ * @async
+ * @param {string} collection_id - ID of TCIA image collection.
+ * @returns {Promise<Object>} - Promise that resolves with data for specified TCIA collection.
+ */
 async function getTciaCollectionData(collection_id) {
   try {
     const response = await fetch(
@@ -68,7 +84,13 @@ async function getTciaCollectionData(collection_id) {
   }
 }
 
-// fetch ICDC study IDs via Bento Backend API
+/**
+ * Retrieves study data from the ICDC backend via a GraphQL query.
+ *
+ * @async
+ * @returns {Promise<Object[]>} - Promise that resolves with an array of ICDC study data objects.
+ * @throws {Error} - Throws error if there is an issue connecting to ICDC backend instance.
+ */
 async function getIcdcStudyData() {
   try {
     const body = JSON.stringify({
@@ -93,7 +115,16 @@ async function getIcdcStudyData() {
   }
 }
 
-// map image collections to corresponding ICDC studies
+/**
+ * Maps ICDC-related data collections from external APIs to corresponding ICDC studies.
+ *
+ * @async
+ * @param {Object} parameters - Parameters object.
+ * @param {string} parameters.study_code - (Optional) ICDC study code by which to filter collections.
+ * @param {Object} context - Context object containing properties/values contained in the request.
+ * @returns {Promise<Object[]>} - Promise that resolves with an array of collection mappings.
+ * @throws {Error} - Throws error if provided study code is not found in ICDC studies data.
+ */
 async function mapCollectionsToStudies(parameters, context) {
   try {
     let redisConnected;
