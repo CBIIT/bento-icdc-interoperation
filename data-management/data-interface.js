@@ -265,10 +265,10 @@ async function mapCollectionsToStudies(parameters, context) {
               metadata: {
                 __typename: "TCIAMetadata",
                 Collection: tciaMatches[match],
-                total_patient_IDs: totalPatients,
-                unique_modalities: uniqueModalities,
-                unique_bodyparts_examined: uniqueBodypartsExamined,
-                total_image_counts: totalImages,
+                Aggregate_PatientID: totalPatients,
+                Aggregate_Modality: uniqueModalities,
+                Aggregate_BodyPartExamined: uniqueBodypartsExamined,
+                Aggregate_ImageCount: totalImages,
               },
             });
           } else {

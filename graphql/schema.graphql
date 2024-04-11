@@ -36,10 +36,10 @@ type IDCMetadata {
 
 type TCIAMetadata {
   Collection: String
-  total_patient_IDs: Int
-  unique_modalities: [String]
-  unique_bodyparts_examined: [String]
-  total_image_counts: Int
+  Aggregate_PatientID: Int
+  Aggregate_Modality: [String]
+  Aggregate_BodyPartExamined: [String]
+  Aggregate_ImageCount: Int
 }
 
 union Metadata = IDCMetadata | TCIAMetadata
