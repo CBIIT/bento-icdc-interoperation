@@ -1,6 +1,5 @@
 const { buildSchema } = require("graphql");
 const { createHandler } = require("graphql-http/lib/use/express");
-const { mapCollectionsToStudies } = require("./data-interface");
 const { uploadManifestToS3 } = require("../connectors/s3-connector");
 
 const schema = buildSchema(
@@ -8,8 +7,6 @@ const schema = buildSchema(
 );
 
 const root = {
-  studiesByProgram: mapCollectionsToStudies,
-  studyLinks: mapCollectionsToStudies,
   storeManifest: uploadManifestToS3,
 };
 

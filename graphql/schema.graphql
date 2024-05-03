@@ -21,44 +21,6 @@ input FileInList {
   drs_uri: String
 }
 
-type IDCMetadata {
-  collection_id: String
-  cancer_type: String
-  date_updated: String
-  description: String
-  doi: String
-  image_types: String
-  location: String
-  species: String
-  subject_count: Int
-  supporting_data: String
-}
-
-type TCIAMetadata {
-  Collection: String
-  Aggregate_PatientID: Int
-  Aggregate_Modality: [String]
-  Aggregate_BodyPartExamined: [String]
-  Aggregate_ImageCount: Int
-}
-
-union Metadata = IDCMetadata | TCIAMetadata
-
-type Link {
-  repository: String
-  url: String
-  metadata: Metadata
-}
-
-type StudyOfProgram {
-  clinical_study_designation: String
-  CRDCLinks: [Link]
-  numberOfCRDCNodes: Int
-  numberOfImageCollections: Int
-}
-
 type QueryType {
-  studiesByProgram: [StudyOfProgram]
-  studyLinks(study_code: String!): [Link]
   storeManifest(manifest: String!): String
 }
