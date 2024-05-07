@@ -2,25 +2,6 @@ schema {
   query: QueryType
 }
 
-input FileInList {
-  file_name: String
-  file_type: String
-  association: String
-  file_description: String
-  file_format: String
-  file_size: Float
-  case_id: String
-  breed: String
-  diagnosis: String
-  study_code: String
-  file_uuid: String
-  md5sum: String
-  sample_id: String
-  individual_id: String
-  name: String
-  drs_uri: String
-}
-
 type QueryType {
   storeManifest(manifest: String!): String
 }
