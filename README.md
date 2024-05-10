@@ -1,6 +1,6 @@
 # bento-icdc-interoperation
 
-This microservice supports interoperability between the ICDC and other nodes in the CRDC via publicly-available APIs. It identifies ICDC-relevant data in the CRDC nodes, maps the data to corresponding ICDC studies and provides an API for the ICDC front-end to retrieve information about the available data, including how to access it. Currently, the microservice searches for and returns relevant image collection data from the IDC and TCIA CRDC nodes; however, with minor updates, the number of CRDC nodes examined can easily be expanded as the need arises.
+This microservice supports data interoperability between the ICDC and Cancer Genomics Cloud. It receives file manifest data in the form of a JSON string from the ICDC front end, converts it to CSV format, stores it in an S3 bucket and returns a signed URL for access.
 
 &nbsp;
 
@@ -10,51 +10,13 @@ This microservice supports interoperability between the ICDC and other nodes in 
 
 &nbsp;
 
-## Data available from CRDC nodes
-
-| CRDC Node |                                                    Response data fields                                                    |
-| :-------: | :------------------------------------------------------------------------------------------------------------------------: |
-|    IDC    | collection_id, cancer_type, date_updated, description, doi, image_types, location, species, subject_count, supporting_data |
-|   TCIA    |                Collection, total_patientIDs, unique_modalities, unique_bodypartsExamined, total_imageCounts                |
-
-&nbsp;
-
 ## Usage
 
 ### Example query:
 
 ```
 {
-    studiesByProgram {
-        clinical_study_designation,
-        CRDCLinks {
-            url,
-            repository,
-            metadata {
-                ... on IDCMetadata {
-                    collection_id,
-                    cancer_type,
-                    date_updated,
-                    description,
-                    doi,
-                    image_types,
-                    location,
-                    species,
-                    subject_count,
-                    supporting_data
-                }
-                ... on TCIAMetadata {
-                    Collection,
-                    total_patient_IDs,
-                    unique_modalities,
-                    unique_bodyparts_examined,
-                    total_image_counts
-                }
-            }
-        },
-        numberOfCRDCNodes,
-        numberOfImageCollections
-    }
+    storeManifest(manifest: "[{\"file_name\":\"010015_0103_sorted.bam\",\"file_type\":\"RNA Sequence File\",\"sample_id\":\"NCATS-COP01-CCB010015 0103\",\"association\":\"sample\",\"file_description\":\"tumor sample binary alignment file: seq reads to canfam3.1\",\"file_format\":\"bam\",\"file_size\":17545870661,\"case_id\":\"NCATS-COP01-CCB010015\",\"breed\":\"Mixed Breed\",\"diagnosis\":\"B Cell Lymphoma\",\"study_code\":\"NCATS-COP01\",\"file_uuid\":\"bf7ae08f-0afe-5aa5-969a-de9a17ac0f2f\",\"md5sum\":\"70ec6bee3d4e5bb9da4641c3fa7f8609\",\"individual_id\":null,\"drs_uri\":\"https://nci-crdc.datacommons.io/ga4gh/drs/v1/objects/dg.4DFC/bf7ae08f-0afe-5aa5-969a-de9a17ac0f2f\",\"name\":\"010015_0103_sorted.bam\"}]")
 }
 ```
 
@@ -65,49 +27,7 @@ This microservice supports interoperability between the ICDC and other nodes in 
 ```
 {
     "data": {
-        "studiesByProgram": [
-            {
-                "clinical_study_designation": "GLIOMA01",
-                "CRDCLinks": [
-                    {
-                        "url": "https://portal.imaging.datacommons.cancer.gov/explore/filters/?collection_id=icdc_glioma",
-                        "repository": "IDC",
-                        "metadata": {
-                            "collection_id": "icdc_glioma",
-                            "cancer_type": "Glioma",
-                            "date_updated": "2022-10-10",
-                            "description": "ICDC-Glioma contains treatment-naïve naturally-occurring canine glioma participants from
-                                the Integrated Canine Data Commons. Brain radiology (57/81 participant animals) and H&E-stained biopsy or
-                                necropsy pathology (76/81 participants) are classified by veterinary and physician neuropathologists. Please see
-                                the wiki to learn more about the images and to obtain any supporting metadata for this collection.",
-                            "doi": "10.7937/tcia.svqt-q016",
-                            "image_types": "MR",
-                            "location": "Head",
-                            "species": "Canine",
-                            "subject_count": 57,
-                            "supporting_data": "Genomics"
-                        }
-                    },
-                    {
-                        "url": "https://nbia.cancerimagingarchive.net/nbia-search/?MinNumberOfStudiesCriteria=1&CollectionCriteria=ICDC-Glioma",
-                        "repository": "TCIA",
-                        "metadata": {
-                            "Collection": "ICDC-Glioma",
-                            "total_patient_IDs": 57,
-                            "unique_modalities": [
-                                "MR"
-                            ],
-                            "unique_bodyparts_examined": [
-                                "HEAD"
-                            ],
-                            "total_image_counts": 17797
-                        }
-                    }
-                ],
-                "numberOfCRDCNodes": 2,
-                "numberOfImageCollections": 2
-            }
-        ]
+        "storeManifest": "https://d1mctv657ruqk3.cloudfront.net/d228872c-4f12-4c52-a9dc-ef3ab953ae75.csv?Expires=0&Key-Pair-Id=K2X5RJOOJWYIEB&Signature=CBB2T1qHhKaWjnVvlFsxfeqnGVcQEJOxIesXpRFYkK3C6Ne3JZU2qHhRH97BFLbpWh570A50JtkZH0~zsJ3N5ZjYLccvSKtFM3oxmxByvSHQtBPtFrhokL6gD1aA0ueoW1XtnZ9MJIYoVZNqVrHpHf2zN59evQD3UPrCkf7dc~6BGmroGI8WVGm6N1TiVpw4alNxsqHttRxLNr0bttPiE7Fc2Oi5K3bOqyJAYVtq2HoOnSahLBkXLf9IK46pLGG88hmipulhbvTi2V5xa7usNYlQ-vwmW1j667dU~ac~Ue8HsnlHcTTU~tTD8Zz7zIIjKhPpm45C8HVdm-LTnauK7A__"
     }
 }
 ```
@@ -116,6 +36,18 @@ This microservice supports interoperability between the ICDC and other nodes in 
 
 ## Environment variables
 
-    - BENTO_BACKEND_GRAPHQL_URI: Bento backend URI for GraphQL POST requests
-    - REDIS_HOST: Redis cache host
-    - REDIS_PORT: Redis cache port
+AWS_REGION
+
+S3_ACCESS_KEY_ID
+
+S3_SECRET_ACCESS_KEY
+
+FILE_MANIFEST_BUCKET_NAME
+
+CLOUDFRONT_KEY_PAIR_ID
+
+CLOUDFRONT_PRIVATE_KEY
+
+CLOUDFRONT_DOMAIN
+
+SIGNED_URL_EXPIRY_SECONDS
