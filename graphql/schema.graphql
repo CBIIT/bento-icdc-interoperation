@@ -37,7 +37,7 @@ type IDCMetadata {
 type TCIAMetadata {
   Collection: String
   Aggregate_PatientID: Int
-  Aggregate_Modality: [String]
+  Aggregate_Modality: String
   Aggregate_BodyPartExamined: [String]
   Aggregate_ImageCount: Int
 }

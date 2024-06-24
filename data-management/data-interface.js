@@ -266,7 +266,7 @@ async function mapCollectionsToStudies(parameters, context) {
                 __typename: "TCIAMetadata",
                 Collection: tciaMatches[match],
                 Aggregate_PatientID: totalPatients,
-                Aggregate_Modality: uniqueModalities,
+                Aggregate_Modality: uniqueModalities.join(", "),
                 Aggregate_BodyPartExamined: uniqueBodypartsExamined,
                 Aggregate_ImageCount: totalImages,
               },
