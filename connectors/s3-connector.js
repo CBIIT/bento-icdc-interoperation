@@ -2,19 +2,18 @@ const { randomUUID } = require("crypto");
 const fs = require("fs").promises;
 const os = require("os");
 const path = require("path");
-const converter = require("json-2-csv");
 const { getSignedUrl } = require("@aws-sdk/cloudfront-signer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const config = require("../config");
 const { errorName } = require("../constants/error-constants");
 
 /**
- * Transforms array of JSON strings representing file manifest
- * into CSV, uploads to S3 bucket and returns pre-signed CloudFront URL.
+ * Writes CSV-formatted string (representing file manifest) to file,
+ * uploads to S3 bucket and returns pre-signed CloudFront URL.
  *
  * @async
  * @param {Object} parameters - Parameters object.
- * @param {string[]} parameters.manifest - Array of JSON strings.
+ * @param {string[]} parameters.manifest - CSV-formatted string.
  * @returns {Promise<string>} - Promise that resolves to a pre-signed CloudFront URL.
  * @throws {Error} - Throws error if file manifest is not an array of JSON strings.
  */
@@ -28,15 +27,9 @@ async function uploadManifestToS3(parameters) {
       },
     });
 
-    const parsedManifest = JSON.parse(parameters.manifest);
-    if (!parsedManifest || !Array.isArray(parsedManifest)) {
-      throw new Error(errorName.MALFORMED_FILE_MANIFEST);
-    }
-
-    const manifestCsv = await converter.json2csv(parsedManifest);
     const tempCsvFile = `${randomUUID()}.csv`;
     const tempCsvFilePath = path.join(os.tmpdir(), tempCsvFile);
-    await fs.writeFile(tempCsvFilePath, manifestCsv, {
+    await fs.writeFile(tempCsvFilePath, parameters.manifest, {
       encoding: "utf-8",
     });
 
