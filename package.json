@@ -22,7 +22,6 @@
     "graphql": "^15.8.0",
     "graphql-http": "^1.21.0",
     "html-to-text": "^9.0.4",
-    "json-2-csv": "^4.1.0",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.7",
     "redis": "^4.6.5"
