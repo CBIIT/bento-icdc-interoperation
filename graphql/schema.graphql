@@ -60,5 +60,5 @@ type StudyOfProgram {
 type QueryType {
   studiesByProgram: [StudyOfProgram]
   studyLinks(study_code: String!): [Link]
-  storeManifest(manifest: [FileInList!]!): String
+  storeManifest(manifest: String!): String
 }

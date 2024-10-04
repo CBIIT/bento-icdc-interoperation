@@ -34,7 +34,7 @@ async function getIdcCollections() {
     return filteredCollections;
   } catch (error) {
     console.error(error);
-    return error;
+    throw new Error(errorName.IDC_INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -50,7 +50,7 @@ async function getTciaCollections() {
     return collectionIds;
   } catch (error) {
     console.error(error);
-    return error;
+    throw new Error(errorName.TCIA_INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -64,7 +64,7 @@ async function getTciaCollectionData(collection_id) {
     return data;
   } catch (error) {
     console.error(error);
-    return error;
+    throw new Error(errorName.TCIA_INTERNAL_SERVER_ERROR);
   }
 }
 
@@ -88,6 +88,7 @@ async function getIcdcStudyIds() {
     );
     return studyIds;
   } catch (error) {
+    console.error(error);
     throw new Error(errorName.BENTO_BACKEND_NOT_CONNECTED);
   }
 }
@@ -100,11 +101,23 @@ async function mapCollectionsToStudies(parameters, context) {
     let queryKey;
 
     try {
-      redisClient = redis.createClient(config.REDIS_HOST, config.REDIS_PORT);
+      if (config.REDIS_AUTH_ENABLED.toLowerCase() !== "true") {
+        redisClient = redis.createClient({
+          host: config.REDIS_HOST,
+          port: config.REDIS_PORT,
+        });
+      } else {
+        redisClient = redis.createClient({
+          host: config.REDIS_HOST,
+          port: config.REDIS_PORT,
+          password: config.REDIS_PASSWORD,
+        });
+      }
       await redisClient.connect();
       redisConnected = true;
       redisClient.on("error", async (error) => await redisClient.disconnect());
     } catch (error) {
+      console.error(error);
       redisConnected = false;
     }
 
