@@ -246,6 +246,13 @@ async function mapCollectionsToStudies(parameters, context) {
               (tot, obj) => tot + parseInt(obj.ImageCount),
               0
             );
+            let imageBool = false;
+
+            if (tciaCollectionMetadata && tciaCollectionMetadata.length > 0) {
+              imageBool = true
+              
+            }
+
             const totalPatients = [
               ...new Set(tciaCollectionMetadata.map((obj) => obj.PatientID)),
             ].length;
@@ -272,6 +279,7 @@ async function mapCollectionsToStudies(parameters, context) {
                 Aggregate_Modality: uniqueModalities.join(", "),
                 Aggregate_BodyPartExamined: uniqueBodypartsExamined,
                 Aggregate_ImageCount: totalImages,
+                Aggregate_ImageBool: imageBool,
               },
             });
           } else {
