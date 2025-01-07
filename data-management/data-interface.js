@@ -34,7 +34,7 @@ async function getIdcCollections() {
     const filteredCollections = filterObjectArray(
       data["collections"],
       "collection_id",
-      "icdc_"
+      "cmb_"
     );
     return filteredCollections;
   } catch (error) {
@@ -55,7 +55,7 @@ async function getTciaCollections() {
       `${TCIA_API_BASE_URL}${TCIA_API_COLLECTIONS_ENDPOINT}`
     );
     const data = await response.json();
-    const filtered = filterObjectArray(data, "Collection", "ICDC-");
+    const filtered = filterObjectArray(data, "Collection", "cmb-");
     const collectionIds = filtered.map((obj) => obj.Collection);
     return collectionIds;
   } catch (error) {
@@ -95,17 +95,22 @@ async function getIcdcStudyData() {
   try {
     const body = JSON.stringify({
       query: `{
-              studiesByProgram {
-                  clinical_study_designation
-                  numberOfImageCollections
-                  numberOfCRDCNodes
-              }
-          }`,
+        studiesByProgram {
+          study_id
+          image_collection_count
+        }
+      }`,
+      variables: {}  // Include the variables here, even if it’s an empty object
     });
+    
     const response = await fetch(config.BENTO_BACKEND_GRAPHQL_URI, {
       method: "POST",
-      body: body,
+      headers: {
+        "Content-Type": "application/json",  // Make sure to set the Content-Type header to JSON
+      },
+      body: body,  // The body now includes both query and variables
     });
+    
     const data = await response.json();
     const studyData = data.data?.studiesByProgram;
     return studyData;
@@ -172,7 +177,7 @@ async function mapCollectionsToStudies(parameters, context) {
     if (
       parameters.study_code?.length >= 0 &&
       !icdcStudies
-        .map((obj) => obj.clinical_study_designation)
+        .map((obj) => obj.study_id)
         .includes(parameters.study_code)
     ) {
       throw new Error(errorName.STUDY_CODE_NOT_FOUND);
@@ -194,11 +199,11 @@ async function mapCollectionsToStudies(parameters, context) {
     for (study in icdcStudies) {
       // fuzzy match strings using damerau-levenshtein distance
       let idcMatches = search(
-        icdcStudies[study]?.clinical_study_designation,
+        icdcStudies[study]?.study_id,
         idcCollections.map((obj) => obj.collection_id)
       );
       let tciaMatches = search(
-        icdcStudies[study]?.clinical_study_designation,
+        icdcStudies[study]?.study_id,
         tciaCollections
       );
 
@@ -297,7 +302,7 @@ async function mapCollectionsToStudies(parameters, context) {
       }
       if (
         parameters.study_code &&
-        parameters.study_code === icdcStudies[study]?.clinical_study_designation
+        parameters.study_code === icdcStudies[study]?.study_id
       ) {
         if (redisConnected) {
           await redisClient.set(queryKey, JSON.stringify(collectionUrls), {
@@ -307,14 +312,11 @@ async function mapCollectionsToStudies(parameters, context) {
         }
         return collectionUrls;
       }
-      if (icdcStudies[study]?.numberOfCRDCNodes > 0) {
+      if (icdcStudies[study]?.image_collection_count > 0) {
         collectionMappings.push({
-          CRDCLinks: collectionUrls,
-          numberOfCRDCNodes: icdcStudies[study]?.numberOfCRDCNodes,
-          numberOfImageCollections:
-            icdcStudies[study]?.numberOfImageCollections,
-          clinical_study_designation:
-            icdcStudies[study]?.clinical_study_designation,
+          associated_links: collectionUrls,
+          image_collection_count: icdcStudies[study]?.image_collection_count,
+          study_id: icdcStudies[study]?.study_id,
         });
       }
     }
