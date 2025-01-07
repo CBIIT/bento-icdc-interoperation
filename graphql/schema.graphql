@@ -53,7 +53,7 @@ type AssociatedLink {
 }
 
 type Study {
-
+  study_short_name: String
   study_id: String
   AssociatedLinks: [AssociatedLink]
   image_collection_count: Int
