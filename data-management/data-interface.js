@@ -92,7 +92,7 @@ async function getTciaCollectionData(collection_id) {
  * @returns {Promise<Object[]>} - Promise that resolves with an array of ICDC study data objects.
  * @throws {Error} - Throws error if there is an issue connecting to ICDC backend instance.
  */
-async function getIcdcStudyData() {
+async function getCtdcStudyData() {
   try {
     const body = JSON.stringify({
       query: `{
@@ -175,7 +175,7 @@ async function mapCollectionsToStudies(parameters, context) {
       }
     }
 
-    const ctdcStudies = await getIcdcStudyData();
+    const ctdcStudies = await getCtdcStudyData();
     if (
       parameters.study_code?.length >= 0 &&
       !ctdcStudies
@@ -346,6 +346,6 @@ async function mapCollectionsToStudies(parameters, context) {
 module.exports = {
   getIdcCollections,
   getTciaCollections,
-  getIcdcStudyData,
+  getCtdcStudyData,
   mapCollectionsToStudies,
 };
