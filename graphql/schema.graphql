@@ -60,7 +60,7 @@ type Study {
 }
 
 type QueryType {
-  studiesByProgram: [Study]
+  getAllStudies: [Study]
   studyLinks(study_code: String!): [AssociatedLink]
   storeManifest(manifest: String!): String
 }

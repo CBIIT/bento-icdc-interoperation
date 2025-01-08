@@ -96,7 +96,7 @@ async function getIcdcStudyData() {
   try {
     const body = JSON.stringify({
       query: `{
-        studiesByProgram {
+        getAllStudies {
           study_id
           study_short_name
           image_collection_count
@@ -114,7 +114,7 @@ async function getIcdcStudyData() {
     });
     
     const data = await response.json();
-    const studyData = data.data?.studiesByProgram;
+    const studyData = data.data?.getAllStudies;
     return studyData;
   } catch (error) {
     console.error(error);

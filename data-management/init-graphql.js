@@ -8,7 +8,7 @@ const schema = buildSchema(
 );
 
 const root = {
-  studiesByProgram: mapCollectionsToStudies,
+  getAllStudies: mapCollectionsToStudies,
   studyLinks: mapCollectionsToStudies,
   storeManifest: uploadManifestToS3,
 };

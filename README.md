@@ -25,7 +25,7 @@ This microservice supports interoperability between the ICDC and other nodes in 
 
 ```
 {
-    studiesByProgram {
+    getAllStudies {
         study_id,
         CRDCLinks {
             url,
@@ -65,7 +65,7 @@ This microservice supports interoperability between the ICDC and other nodes in 
 ```
 {
     "data": {
-        "studiesByProgram": [
+        "getAllStudies": [
             {
                 "study_id": "GLIOMA01",
                 "CRDCLinks": [
