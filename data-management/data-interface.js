@@ -323,7 +323,7 @@ async function mapCollectionsToStudies(parameters, context) {
       }
       if (ctdcStudies[study]?.image_collection_count > 0) {
         collectionMappings.push({
-          AssociatedLinks: collectionUrls,
+          associated_links: collectionUrls,
           image_collection_count: ctdcStudies[study]?.image_collection_count,
           study_id: ctdcStudies[study]?.study_id,
           study_short_name: ctdcStudies[study]?.study_short_name,
