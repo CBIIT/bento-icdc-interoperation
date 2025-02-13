@@ -27,7 +27,6 @@
     "redis": "^4.6.5"
   },
   "devDependencies": {
-    "jest": "^29.2.2",
     "nodemon": "^2.0.20"
   }
 }
