@@ -24,7 +24,9 @@ app.use(
       "http://localhost:3000",
       "https://caninecommons-dev.cancer.gov",
       "https://caninecommons-qa.cancer.gov",
+      "https://caninecommons-stage.cancer.gov",
       "https://caninecommons.cancer.gov",
+      "https://caninecommons-test.cancer.gov",
     ],
   })
 );
