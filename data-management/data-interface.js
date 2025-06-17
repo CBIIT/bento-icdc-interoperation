@@ -204,7 +204,7 @@ async function mapCollectionsToStudies(parameters, context) {
 
       let collectionUrls = [];
 
-      if (idcMatches.length !== 0) {
+      if (idcMatches.length === 0) {
         for (match in idcMatches) {
           const idcCollectionUrl = `${IDC_COLLECTION_BASE_URL}${idcMatches[match]}`;
           let idcCollectionMetadata = idcCollections.find(
