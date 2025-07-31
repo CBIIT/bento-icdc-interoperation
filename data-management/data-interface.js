@@ -110,6 +110,7 @@ async function getIcdcStudyData() {
     const studyData = data.data?.studiesByProgram;
     return studyData;
   } catch (error) {
+    console.log(">>> >>> >>> ERROR:  ", error);
     console.error(error);
     throw new Error(errorName.BENTO_BACKEND_NOT_CONNECTED);
   }
