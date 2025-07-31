@@ -18,16 +18,28 @@ const accessLogStream = fs.createWriteStream(
 );
 
 const app = express();
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://caninecommons-dev.cancer.gov",
+  "https://caninecommons-qa.cancer.gov",
+  "https://caninecommons-stage.cancer.gov",
+  "https://caninecommons.cancer.gov",
+  "https://caninecommons-test.cancer.gov",
+  "https://internal-crdc-i-alb8a-ftoq5dvktc0w-373649459.us-east-1.elb.amazonaws.com",
+  "http://internal-crdc-i-alb8a-ftoq5dvktc0w-373649459.us-east-1.elb.amazonaws.com",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://caninecommons-dev.cancer.gov",
-      "https://caninecommons-qa.cancer.gov",
-      "https://caninecommons-stage.cancer.gov",
-      "https://caninecommons.cancer.gov",
-      "https://caninecommons-test.cancer.gov",
-    ],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    allowedHeaders: ["Content-Type"],
   })
 );
 
