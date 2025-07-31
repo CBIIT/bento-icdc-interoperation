@@ -102,6 +102,7 @@ async function getIcdcStudyData() {
               }
           }`,
     });
+    console.log(">>> >>> >>> BACKEND GRAPHQL URI: ", config.BENTO_BACKEND_GRAPHQL_URI);
     const response = await fetch(config.BENTO_BACKEND_GRAPHQL_URI, {
       method: "POST",
       body: body,
@@ -128,7 +129,7 @@ async function getIcdcStudyData() {
  */
 async function mapCollectionsToStudies(parameters, context) {
   console.log(">>> >>> >>> CONFIG:  ", config);
-
+  console.log(">>> >>> >>> BACKEND GRAPHQL URI: ", config.BENTO_BACKEND_GRAPHQL_URI);
   try {
     let redisConnected;
     let redisClient;
