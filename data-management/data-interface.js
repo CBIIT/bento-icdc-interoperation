@@ -126,6 +126,8 @@ async function getIcdcStudyData() {
  * @throws {Error} - Throws error if provided study code is not found in ICDC studies data.
  */
 async function mapCollectionsToStudies(parameters, context) {
+  console.log(">>> >>> >>> CONFIG:  ", config)
+
   try {
     let redisConnected;
     let redisClient;
