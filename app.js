@@ -27,6 +27,8 @@ app.use(
       "https://caninecommons-stage.cancer.gov",
       "https://caninecommons.cancer.gov",
       "https://caninecommons-test.cancer.gov",
+      "https://internal-crdc-i-alb8a-ftoq5dvktc0w-373649459.us-east-1.elb.amazonaws.com",
+      "http://internal-crdc-i-alb8a-ftoq5dvktc0w-373649459.us-east-1.elb.amazonaws.com",
     ],
   })
 );
