@@ -25,16 +25,25 @@ const allowedOrigins = [
   "https://caninecommons-stage.cancer.gov",
   "https://caninecommons.cancer.gov",
   "https://caninecommons-test.cancer.gov",
-  "https://internal-crdc-i-alb8a-ftoq5dvktc0w-373649459.us-east-1.elb.amazonaws.com",
-  "http://internal-crdc-i-alb8a-ftoq5dvktc0w-373649459.us-east-1.elb.amazonaws.com",
 ];
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+
+  // Custom match for internal ALBs
+  if (origin.startsWith("https://internal-crdc-i-alb8a-")) return true;
+
+  return false;
+}
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
+        console.warn("Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
