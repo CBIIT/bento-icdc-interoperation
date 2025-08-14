@@ -20,6 +20,7 @@ const accessLogStream = fs.createWriteStream(
 const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:7000",
   "https://caninecommons-dev.cancer.gov",
   "https://caninecommons-qa.cancer.gov",
   "https://caninecommons-stage.cancer.gov",
