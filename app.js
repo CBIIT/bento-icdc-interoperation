@@ -31,8 +31,9 @@ function isAllowedOrigin(origin) {
   if (!origin) return true;
   if (allowedOrigins.includes(origin)) return true;
 
-  // Custom match for internal ALBs
-  if (origin.startsWith("https://internal-crdc-i-alb8a-")) return true;
+  // Match any internal CRDC ALB domain
+  const internalCrdcAlbRegex = /^https:\/\/internal-crdc-i-[a-z0-9-]+-[a-z0-9]+-[0-9]+\.([a-z0-9-]+)\.elb\.amazonaws\.com$/;
+  if (internalCrdcAlbRegex.test(origin)) return true;
 
   return false;
 }
