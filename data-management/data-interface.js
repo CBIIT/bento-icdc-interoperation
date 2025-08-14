@@ -110,7 +110,6 @@ async function getIcdcStudyData() {
     const studyData = data.data?.studiesByProgram;
     return studyData;
   } catch (error) {
-    console.log(">>> ERROR:  ", error);
     console.error(error);
     throw new Error(errorName.BENTO_BACKEND_NOT_CONNECTED);
   }
@@ -127,9 +126,6 @@ async function getIcdcStudyData() {
  * @throws {Error} - Throws error if provided study code is not found in ICDC studies data.
  */
 async function mapCollectionsToStudies(parameters, context) {
-  console.log(">>> BACKEND URI: ", config.BENTO_BACKEND_GRAPHQL_URI);
-  console.log(">>> REQUEST:  ", context.req.body);
-  console.log(">>> ORIGIN:  ", context.req.headers.origin);
   try {
     let redisConnected;
     let redisClient;
