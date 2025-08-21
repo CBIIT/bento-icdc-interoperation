@@ -54,7 +54,7 @@ paths:
                 example:
                   value:
                     version: "1.0.2.131"
-                    date: "2025-07-22"
+                    date: "YYYY-MM-DD"  # Replace with the current date
 
   /api/interoperation/graphql:
     post:
