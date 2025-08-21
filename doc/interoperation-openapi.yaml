@@ -161,7 +161,6 @@ components:
     GraphQLRequest:
       type: object
       required: [query]
-      additionalProperties: false
       properties:
         query:
           type: string
