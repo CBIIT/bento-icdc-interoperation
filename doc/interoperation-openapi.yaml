@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: bento-icdc-interoperation
-  version: 1.0.2.131
+  version: x.x.x
   description: |
     Interoperation microservice for ICDC. Exposes GraphQL over HTTP along with
     simple health endpoints used by the frontend and infrastructure.
