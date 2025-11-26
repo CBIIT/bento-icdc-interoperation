@@ -83,4 +83,6 @@ app.use(function (err, req, res, next) {
   res.json(message);
 });
 
+process.exit()
+
 module.exports = app;
