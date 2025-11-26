@@ -51,7 +51,7 @@ app.use(
       if (isAllowedOrigin(origin)) {
         callback(null, true);
       } else {
-        console.warn("Origin blocked by CORS policy");
+        console.warn(`Origin blocked by CORS policy: ${origin}`);
         callback(new Error("Not allowed by CORS"));
       }
     },
