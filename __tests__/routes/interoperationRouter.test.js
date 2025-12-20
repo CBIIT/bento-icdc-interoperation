@@ -7,14 +7,14 @@ jest.mock("../../config", () => ({
   date: "2025-01-15",
 }));
 
-const healthCheckRouter = require("../../routes/interoperation");
+const interoperationRouter = require("../../routes/interoperation");
 
-describe("healthCheckRouter", () => {
+describe("interoperationRouter", () => {
   let app;
 
   beforeEach(() => {
     app = express();
-    app.use("/api/interoperation", healthCheckRouter);
+    app.use("/api/interoperation", interoperationRouter);
   });
 
   describe("GET /ping", () => {
