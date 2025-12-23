@@ -1,0 +1,198 @@
+openapi: 3.1.0
+info:
+  title: bento-icdc-interoperation
+  version: x.x.x
+  description: |
+    Interoperation microservice for ICDC. Exposes GraphQL over HTTP along with
+    simple health endpoints used by the frontend and infrastructure.
+servers:
+  - url: http://localhost:3000
+    description: Local development
+  - url: https://caninecommons-dev.cancer.gov
+    description: DEV
+  - url: https://caninecommons-qa.cancer.gov
+    description: QA
+  - url: https://caninecommons-stage.cancer.gov
+    description: STAGE
+  - url: https://caninecommons.cancer.gov
+    description: PROD
+
+tags:
+  - name: health
+    description: Liveness and version endpoints
+  - name: graphql
+    description: GraphQL transport (POST /api/interoperation/graphql)
+
+paths:
+  /api/interoperation/ping:
+    get:
+      tags: [health]
+      summary: Liveness check
+      operationId: getPing
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: pong
+
+  /api/interoperation/version:
+    get:
+      tags: [health]
+      summary: Service version
+      operationId: getVersion
+      responses:
+        '200':
+          description: Version info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionResponse'
+              examples:
+                example:
+                  value:
+                    version: "1.0.2.131"
+                    date: "YYYY-MM-DD"  # Replace with the current date
+
+  /api/interoperation/graphql:
+    post:
+      tags: [graphql]
+      summary: Execute GraphQL operation
+      description: |
+        Send GraphQL queries or mutations as JSON. Introspection is supported.
+        This endpoint accepts **POST** only.
+      operationId: postGraphQL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphQLRequest'
+            examples:
+              introspection:
+                summary: Minimal introspection
+                value:
+                  query: "query { __schema { queryType { name } } }"
+              studiesByProgram:
+                summary: Domain example
+                value:
+                  query: |
+                    {
+                      studiesByProgram {
+                        clinical_study_designation
+                        CRDCLinks {
+                          url
+                          repository
+                          metadata {
+                            ... on IDCMetadata { collection_id cancer_type date_updated description doi image_types location species subject_count supporting_data }
+                            ... on TCIAMetadata { Collection Aggregate_PatientID Aggregate_Modality Aggregate_BodyPartExamined Aggregate_ImageCount }
+                          }
+                        }
+                        numberOfCRDCNodes
+                        numberOfImageCollections
+                      }
+                    }
+      responses:
+        '200':
+          description: GraphQL response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphQLResponse'
+              examples:
+                success:
+                  summary: studiesByProgram success
+                  value:
+                    data:
+                      studiesByProgram:
+                        - clinical_study_designation: "GLIOMA01"
+                          CRDCLinks:
+                            - url: "https://portal.imaging.datacommons.cancer.gov/explore/filters/?collection_id=icdc_glioma"
+                              repository: "IDC"
+                              metadata:
+                                collection_id: "icdc_glioma"
+                                cancer_type: "Glioma"
+                                date_updated: "2025-04-10"
+                                description: "ICDC-Glioma contains treatment-naïve naturally-occurring canine glioma participants from the Integrated Canine Data Commons. Brain radiology (57/81 participant animals) and H&E-stained biopsy or necropsy pathology (76/81 participants) are classified by veterinary and physician neuropathologists. Please see the wiki to learn more about the radiology images and to obtain any supporting metadata for this collection. Please see the wiki DICOM converted Slide Microscopy images for the ICDC-Glioma collection to learn more about the histopathology images and to obtain any supporting metadata for this collection."
+                                doi: "10.7937/tcia.svqt-q016 10.5281/zenodo.12690000"
+                                image_types: "MR, SM"
+                                location: "Head"
+                                species: "Canine"
+                                subject_count: 80
+                                supporting_data: "Genomics"
+                            - url: "https://nbia.cancerimagingarchive.net/nbia-search/?MinNumberOfStudiesCriteria=1&CollectionCriteria=ICDC-Glioma"
+                              repository: "TCIA"
+                              metadata:
+                                Collection: "ICDC-Glioma"
+                                Aggregate_PatientID: 57
+                                Aggregate_Modality: "MR, Histopathology"
+                                Aggregate_BodyPartExamined:
+                                  - "HEAD"
+                                Aggregate_ImageCount: 17881
+                          numberOfCRDCNodes: 2
+                          numberOfImageCollections: 2
+                error:
+                  summary: GraphQL error example
+                  value:
+                    errors:
+                      - message: "BENTO_BACKEND_NOT_CONNECTED"
+                        locations:
+                          - line: 2
+                            column: 5
+                        path: ["studiesByProgram"]
+                    data:
+                      studiesByProgram: null
+
+components:
+  schemas:
+    VersionResponse:
+      type: object
+      required: [version, date]
+      properties:
+        version:
+          type: string
+        date:
+          type: string
+          format: date
+          description: YYYY-MM-DD
+
+    GraphQLRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+        variables:
+          type: object
+          additionalProperties: true
+        operationName:
+          type: string
+
+    GraphQLResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GraphQLError'
+
+    GraphQLError:
+      type: object
+      properties:
+        message:
+          type: string
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              line: { type: integer }
+              column: { type: integer }
+        path:
+          type: array
+          items: { type: string }

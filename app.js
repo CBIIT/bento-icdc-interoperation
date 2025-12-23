@@ -18,16 +18,46 @@ const accessLogStream = fs.createWriteStream(
 );
 
 const app = express();
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:7000",
+  "https://caninecommons-dev.cancer.gov",
+  "https://caninecommons-qa.cancer.gov",
+  "https://caninecommons-stage.cancer.gov",
+  "https://caninecommons.cancer.gov",
+  "https://caninecommons-test.cancer.gov",
+];
+
+// Match any internal CRDC ALB domain
+const awsRegions = [
+  "us-east-1", "us-east-2", "us-west-1", "us-west-2",
+];
+const awsRegionPattern = awsRegions.join("|");
+const internalCrdcAlbRegex = new RegExp(
+  `^https://internal-crdc-i-[a-z0-9-]+-[a-z0-9]+-[0-9]+\\.(${awsRegionPattern})\\.elb\\.amazonaws\\.com$`
+);
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  if (internalCrdcAlbRegex.test(origin)) return true;
+
+  return false;
+}
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://caninecommons-dev.cancer.gov",
-      "https://caninecommons-qa.cancer.gov",
-      "https://caninecommons-stage.cancer.gov",
-      "https://caninecommons.cancer.gov",
-      "https://caninecommons-test.cancer.gov",
-    ],
+    origin: function (origin, callback) {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+      } else {
+        console.warn(`Origin blocked by CORS policy: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    allowedHeaders: ["Content-Type"],
   })
 );
 
