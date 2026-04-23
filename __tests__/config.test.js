@@ -83,6 +83,7 @@ describe("config.js", () => {
   });
 
   it("throws and lists missing env vars", () => {
+    const env = {};
     expect(() => loadConfigWithEnv(env)).toThrow(
       /The following environment variables are not set:/
     );

@@ -32,8 +32,8 @@ describe("interoperationRouter", () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
-        VERSION: "1.2.3",
-        DATE: "2025-01-15",
+        version: "1.2.3",
+        date: "2025-01-15",
       });
     });
   });
