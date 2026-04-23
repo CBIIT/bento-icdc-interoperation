@@ -3,8 +3,8 @@ const request = require("supertest");
 
 // Mock the config module
 jest.mock("../../config", () => ({
-  version: "1.2.3",
-  date: "2025-01-15",
+  VERSION: "1.2.3",
+  DATE: "2025-01-15",
 }));
 
 const interoperationRouter = require("../../routes/interoperation");
@@ -32,8 +32,8 @@ describe("interoperationRouter", () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
-        version: "1.2.3",
-        date: "2025-01-15",
+        VERSION: "1.2.3",
+        DATE: "2025-01-15",
       });
     });
   });
