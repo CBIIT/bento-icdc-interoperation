@@ -27,5 +27,9 @@
     "jest": "^30.2.0",
     "nodemon": "^3.1.9",
     "supertest": "^7.1.4"
+  },
+  "overrides": {
+    "fast-xml-parser": ">=5.7.0",
+    "path-to-regexp": ">=0.1.13"
   }
 }
