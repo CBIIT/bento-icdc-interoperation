@@ -5,7 +5,6 @@ const path = require("path");
 const { getSignedUrl } = require("@aws-sdk/cloudfront-signer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const config = require("../config");
-const { errorName } = require("../constants/error-constants");
 
 /**
  * Writes CSV-formatted string (representing file manifest) to file,
