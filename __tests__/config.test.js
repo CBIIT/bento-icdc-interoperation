@@ -10,9 +10,6 @@ function baseRequiredEnv(overrides = {}) {
   return {
     VERSION: "1.2.3",
     DATE: "2025-01-15",
-    BENTO_BACKEND_GRAPHQL_URI: "http://example/graphql",
-    REDIS_HOST: "localhost",
-    REDIS_PORT: "6379",
     AWS_REGION: "us-east-1",
     S3_ACCESS_KEY_ID: "test-access",
     S3_SECRET_ACCESS_KEY: "test-secret",
@@ -21,8 +18,6 @@ function baseRequiredEnv(overrides = {}) {
     CLOUDFRONT_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----",
     CLOUDFRONT_DOMAIN: "d123.cloudfront.net",
     SIGNED_URL_EXPIRY_SECONDS: "3600",
-    REDIS_AUTH_ENABLED: "false", // default off
-    // REDIS_PASSWORD intentionally omitted unless REDIS_AUTH_ENABLED is true
     ...overrides,
   };
 }
@@ -51,9 +46,6 @@ describe("config.js", () => {
     [
       "VERSION",
       "DATE",
-      "BENTO_BACKEND_GRAPHQL_URI",
-      "REDIS_HOST",
-      "REDIS_PORT",
       "AWS_REGION",
       "S3_ACCESS_KEY_ID",
       "S3_SECRET_ACCESS_KEY",
@@ -62,8 +54,6 @@ describe("config.js", () => {
       "CLOUDFRONT_PRIVATE_KEY",
       "CLOUDFRONT_DOMAIN",
       "SIGNED_URL_EXPIRY_SECONDS",
-      "REDIS_AUTH_ENABLED",
-      "REDIS_PASSWORD",
     ].forEach((k) => delete process.env[k]);
   });
 
@@ -76,41 +66,24 @@ describe("config.js", () => {
       baseRequiredEnv({ REDIS_AUTH_ENABLED: "false" })
     );
 
-    expect(config.version).toBe("1.2.3");
-    expect(config.date).toBe("2025-01-15");
-    expect(config.REDIS_HOST).toBe("localhost");
+    expect(config.VERSION).toBe("1.2.3");
+    expect(config.DATE).toBe("2025-01-15");
   });
 
   it("sets default version and date when missing", () => {
-    // Delete VERSION/DATE so config.version and config.date start as undefined
+    // Delete VERSION/DATE so config.VERSION and config.DATE start as undefined
     const env = baseRequiredEnv();
     delete env.VERSION;
     delete env.DATE;
 
     const config = loadConfigWithEnv(env);
 
-    expect(config.version).toBe("Version not set!");
-    expect(config.date).toEqual(expect.any(Date));
-  });
-
-  it("does NOT require REDIS_PASSWORD when REDIS_AUTH_ENABLED is not true", () => {
-    const env = baseRequiredEnv({ REDIS_AUTH_ENABLED: "false" });
-    delete env.REDIS_PASSWORD;
-
-    expect(() => loadConfigWithEnv(env)).not.toThrow();
-  });
-
-  it("requires REDIS_PASSWORD when REDIS_AUTH_ENABLED is true (case-insensitive)", () => {
-    const env = baseRequiredEnv({ REDIS_AUTH_ENABLED: "TrUe" });
-    delete env.REDIS_PASSWORD;
-
-    expect(() => loadConfigWithEnv(env)).toThrow(/REDIS_PASSWORD/);
+    expect(config.VERSION).toBe("Version not set!");
+    expect(config.DATE).toEqual(expect.any(Date));
   });
 
   it("throws and lists missing env vars", () => {
-    // Provide almost nothing (but keep REDIS_AUTH_ENABLED false so it won't require password)
-    const env = { REDIS_AUTH_ENABLED: "false" };
-
+    const env = {};
     expect(() => loadConfigWithEnv(env)).toThrow(
       /The following environment variables are not set:/
     );
@@ -118,7 +91,6 @@ describe("config.js", () => {
     try {
       loadConfigWithEnv(env);
     } catch (e) {
-      expect(e.message).toMatch(/BENTO_BACKEND_GRAPHQL_URI/);
       expect(e.message).toMatch(/AWS_REGION/);
     }
   });

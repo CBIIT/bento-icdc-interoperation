@@ -10,8 +10,8 @@ router.get("/ping", function (req, res, next) {
 // GET app version
 router.get("/version", function (req, res, next) {
   res.json({
-    version: config.version,
-    date: config.date,
+    version: config.VERSION,
+    date: config.DATE,
   });
 });
 

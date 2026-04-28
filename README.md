@@ -1,121 +1,63 @@
 # bento-icdc-interoperation
 
-This microservice supports interoperability between the ICDC and other nodes in the CRDC via publicly-available APIs. It identifies ICDC-relevant data in the CRDC nodes, maps the data to corresponding ICDC studies and provides an API for the ICDC front-end to retrieve information about the available data, including how to access it. Currently, the microservice searches for and returns relevant image collection data from the IDC and TCIA CRDC nodes; however, with minor updates, the number of CRDC nodes examined can easily be expanded as the need arises.
+This microservice provides an API for the ICDC front-end to upload a file manifest to an S3 bucket and receive a pre-signed CloudFront URL that the client can use for integration with the Cancer Genomics Cloud.
 
 &nbsp;
 
-## Interoperation process overview
+## Process overview
 
 ![Interoperation Sequence Diagram](./doc/sequence_diagram.png)
 
 &nbsp;
 
-## Data available from CRDC nodes
-
-| CRDC Node |                                                    Response data fields                                                    |
-| :-------: | :------------------------------------------------------------------------------------------------------------------------: |
-|    IDC    | collection_id, cancer_type, date_updated, description, doi, image_types, location, species, subject_count, supporting_data |
-|   TCIA    |                Collection, total_patientIDs, unique_modalities, unique_bodypartsExamined, total_imageCounts                |
-
-&nbsp;
-
 ## Usage
+
+### GraphQL endpoint
+
+`POST /api/interoperation/graphql`
 
 ### Example query:
 
-```
+```graphql
 {
-    studiesByProgram {
-        clinical_study_designation,
-        CRDCLinks {
-            url,
-            repository,
-            metadata {
-                ... on IDCMetadata {
-                    collection_id,
-                    cancer_type,
-                    date_updated,
-                    description,
-                    doi,
-                    image_types,
-                    location,
-                    species,
-                    subject_count,
-                    supporting_data
-                }
-                ... on TCIAMetadata {
-                    Collection,
-                    total_patient_IDs,
-                    unique_modalities,
-                    unique_bodyparts_examined,
-                    total_image_counts
-                }
-            }
-        },
-        numberOfCRDCNodes,
-        numberOfImageCollections
-    }
+    storeManifest(manifest: "col1,col2\nval1,val2")
 }
 ```
-
-&nbsp;
 
 ### Example response:
 
-```
+```json
 {
     "data": {
-        "studiesByProgram": [
-            {
-                "clinical_study_designation": "GLIOMA01",
-                "CRDCLinks": [
-                    {
-                        "url": "https://portal.imaging.datacommons.cancer.gov/explore/filters/?collection_id=icdc_glioma",
-                        "repository": "IDC",
-                        "metadata": {
-                            "collection_id": "icdc_glioma",
-                            "cancer_type": "Glioma",
-                            "date_updated": "2022-10-10",
-                            "description": "ICDC-Glioma contains treatment-naïve naturally-occurring canine glioma participants from
-                                the Integrated Canine Data Commons. Brain radiology (57/81 participant animals) and H&E-stained biopsy or
-                                necropsy pathology (76/81 participants) are classified by veterinary and physician neuropathologists. Please see
-                                the wiki to learn more about the images and to obtain any supporting metadata for this collection.",
-                            "doi": "10.7937/tcia.svqt-q016",
-                            "image_types": "MR",
-                            "location": "Head",
-                            "species": "Canine",
-                            "subject_count": 57,
-                            "supporting_data": "Genomics"
-                        }
-                    },
-                    {
-                        "url": "https://nbia.cancerimagingarchive.net/nbia-search/?MinNumberOfStudiesCriteria=1&CollectionCriteria=ICDC-Glioma",
-                        "repository": "TCIA",
-                        "metadata": {
-                            "Collection": "ICDC-Glioma",
-                            "total_patient_IDs": 57,
-                            "unique_modalities": [
-                                "MR"
-                            ],
-                            "unique_bodyparts_examined": [
-                                "HEAD"
-                            ],
-                            "total_image_counts": 17797
-                        }
-                    }
-                ],
-                "numberOfCRDCNodes": 2,
-                "numberOfImageCollections": 2
-            }
-        ]
+        "storeManifest": "https://d123.cloudfront.net/550e8400-e29b-41d4-a716-446655440000.csv?Policy=...&Signature=...&Key-Pair-Id=..."
     }
 }
 ```
+
+The returned URL is time-limited (controlled by `SIGNED_URL_EXPIRY_SECONDS`) and can be used directly by the client to download the uploaded manifest file.
+
+&nbsp;
+
+## Health endpoints
+
+| Method | Path | Description |
+| :----: | :--- | :---------- |
+| GET | `/api/interoperation/ping` | Liveness check — returns `pong` |
+| GET | `/api/interoperation/version` | Returns service `version` and `date` |
 
 &nbsp;
 
 ## Environment variables
 
-    - BENTO_BACKEND_GRAPHQL_URI: Bento backend URI for GraphQL POST requests
-    - REDIS_HOST: Redis cache host
-    - REDIS_PORT: Redis cache port
+| Variable | Description |
+| :------- | :---------- |
+| `VERSION` | Service version string |
+| `DATE` | Service release date |
+| `AWS_REGION` | AWS region for the S3 client |
+| `S3_ACCESS_KEY_ID` | AWS access key ID for S3 uploads |
+| `S3_SECRET_ACCESS_KEY` | AWS secret access key for S3 uploads |
+| `FILE_MANIFEST_BUCKET_NAME` | S3 bucket name where manifest files are stored |
+| `CLOUDFRONT_KEY_PAIR_ID` | CloudFront key pair ID used to sign URLs |
+| `CLOUDFRONT_PRIVATE_KEY` | CloudFront private key used to sign URLs |
+| `CLOUDFRONT_DOMAIN` | CloudFront distribution domain (e.g. `https://d123.cloudfront.net`) |
+| `SIGNED_URL_EXPIRY_SECONDS` | Lifetime of the generated pre-signed URL in seconds |

@@ -1,0 +1,40 @@
+name: Coverage Report
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["coverage-report"]
+  pull_request:
+    branches: ["coverage-report"]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test Changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run Tests (coverage)
+        run: npm run test:coverage
+
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage/lcov.info
+          format: lcov
