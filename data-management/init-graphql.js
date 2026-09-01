@@ -34,7 +34,6 @@ function configureSecurity() {
     validationRules,
   };
 }
-console.log(process.env.GRAPHQL_INTROSPECTION_ENABLED?.toLowerCase() === "true")
 const securityConfig = configureSecurity();
 
 module.exports = (req, res) => {
